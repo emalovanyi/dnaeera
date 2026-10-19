@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Osobný DNA Test - GymBeam — konfigurátor (mockup)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+/* ===========================================================================
+   Tailwind theme — 1:1 with the @theme block in src/styles/global.css
+   and the tokens in src/styles/contrast-theme.css
+   =========================================================================== */
+tailwind.config = {
+  theme: {
+    screens: {
+      usm: '480px', sm: '650px', md: '1024px',
+      lg: '1280px', xl: '1440px', desktop: '1440px', '2xl': '1536px',
+    },
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+      },
+      colors: {
+        primary: '#000',
+        secondary: {
+          DEFAULT: '#ff4100', disabled: '#ffa080',
+          hover: '#cc3400', strong: '#c23500',
+        },
+        grey: {
+          DEFAULT: '#6c6c6c', 100: '#dfdedd', 200: '#a8a69f',
+          300: '#959595', 400: '#757779', 500: '#575757', 600: '#4a4948',
+        },
+        success: { DEFAULT: '#8bc34a', light: '#8bc34a', strong: '#567b24' },
+        error: '#ff6b6b',
+        shadow: '#f4f4f4',
+      },
+      gridTemplateColumns: { 'footer-blocks': '1fr 1.3fr 1.2fr' },
+      spacing: { '9.5': '2.375rem', '18': '4.5rem', '30': '7.5rem' },
+      maxWidth: { desktop: '1440px' },
+    },
+  },
+}
+</script>
+
+<style>
+/* ===========================================================================
+   PDP tabs — copied from src/modules/product/components/tabs/product-tabs.css
+   =========================================================================== */
+#pdp-tabs { --pdp-tab-scroll-margin: 96px; }
+@media (min-width: 1024px) { #pdp-tabs { --pdp-tab-scroll-margin: 1rem; } }
+@media (min-width: 1280px) { #pdp-tabs { --pdp-tab-scroll-margin: calc(75px + 1rem); } }
+
+#pdp-tabs [data-pdp-tab-panel] {
+  display: none;
+  scroll-margin-top: var(--pdp-tab-scroll-margin, 96px);
+}
+#pdp-tabs [data-pdp-tab-panel]:target { display: block; }
+
+@media (min-width: 1024px) {
+  #pdp-tabs:not(:has([data-pdp-tab-panel]:target))
+    [data-pdp-tab-panel][data-pdp-tab-default] { display: block; }
+}
+@supports not selector(:has(*)) {
+  @media (min-width: 1024px) {
+    #pdp-tabs [data-pdp-tab-panel][data-pdp-tab-default] { display: block; }
+  }
+}
+
+@media (min-width: 1280px) {
+  #pdp-tabs [data-pdp-tab-trigger] { order: 0; }
+  #pdp-tabs::after {
+    content: ''; order: 1; flex-basis: 100%; height: 1px;
+    margin-bottom: 1rem; background-color: #e5e7eb;
+  }
+  #pdp-tabs [data-pdp-tab-panel] { order: 2; flex-basis: 100%; min-width: 0; }
+}
+
+@media (min-width: 1024px) {
+  #pdp-tabs [data-pdp-tab-trigger]:has(+ [data-pdp-tab-panel]:target) [data-pdp-tab],
+  #pdp-tabs:not(:has([data-pdp-tab-panel]:target))
+    [data-pdp-tab-trigger]:has(+ [data-pdp-tab-panel][data-pdp-tab-default]) [data-pdp-tab] {
+    border-color: #ff4100;
+  }
+}
+@media (max-width: 1023.98px) {
+  #pdp-tabs [data-pdp-tab-trigger]:has(+ [data-pdp-tab-panel]:target) [data-pdp-tab] {
+    border-bottom-width: 0;
+  }
+  #pdp-tabs [data-pdp-tab-trigger]:has(+ [data-pdp-tab-panel]:target) [data-pdp-tab]::before {
+    content: ''; position: absolute; top: 1rem; bottom: 1rem; left: 0;
+    width: 0.125rem; background-color: #ff4100;
+  }
+}
+#pdp-tabs [data-pdp-tab-trigger]:has(+ [data-pdp-tab-panel]:target) [data-pdp-tab-chevron] {
+  rotate: 0deg; transform: rotate(0deg);
+}
+
+/* ===========================================================================
+   Footer — from src/common/components/footer/footer-legacy.css
+   =========================================================================== */
+#page_footer { background-color: #000; color: #fff; }
+#page_footer h4 { margin: 0 0 1em; font-weight: 400; color: #fff; }
+#page_footer p { margin: 0 0 1em; }
+#page_footer ul > li { margin-bottom: 0.625rem; }
+@media (max-width: 767px) { #page_footer ul > li { margin-bottom: 0.9375rem; } }
+#page_footer .social ul { display: flex; list-style-type: none; padding: 0; }
+#page_footer .social ul li { margin-right: 0.5em; }
+#page_footer .footer-block.social { display: flex; flex-direction: column; gap: 0.8rem; }
+#page_footer a:hover { text-decoration: underline; }
+
+body { font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+*, *::before, *::after { border-color: #dfdedd; }
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.qty-input { -moz-appearance: textfield; }
+
+[data-step-panel] { display: none; }
+[data-step-panel][data-active] { display: block; }
+
+#heroDesc { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+#heroDesc[data-expanded] { display: block; }
+
+/* ===========================================================================
+   Overlays — BottomModal below md (1024px), classic Modal above.
+   Mirrors src/common/components/bottom-modal/* and src/common/components/modal/modal.tsx
+   =========================================================================== */
+.gb-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  display: none;
+}
+.gb-overlay[data-open] { display: flex; }
+
+/* scrim — BottomModal: "fixed inset-0 bg-black transition-opacity duration-300" */
+.gb-scrim {
+  position: fixed; inset: 0; background: #000;
+  opacity: 0; transition: opacity .3s;
+}
+.gb-overlay[data-shown] .gb-scrim { opacity: .5; }
+
+/* --- mobile: bottom sheet --- */
+@media (max-width: 1023.98px) {
+  .gb-overlay { align-items: flex-end; }
+  .gb-panel {
+    position: relative; width: 100%;
+    border-radius: 1rem 1rem 0 0;
+    background: #fff; box-shadow: 0 -8px 30px rgba(0,0,0,.25);
+    display: flex; flex-direction: column;
+    max-height: var(--sheet-max, 88dvh);
+    transform: translateY(100%);
+    transition: transform .3s ease-out;
+  }
+  .gb-overlay[data-shown] .gb-panel { transform: translateY(0); }
+  .gb-handle { display: flex; }
+}
+
+/* --- desktop: centered modal --- */
+@media (min-width: 1024px) {
+  .gb-overlay { align-items: flex-start; justify-content: center; overflow-y: auto; padding: 1rem; }
+  .gb-panel {
+    position: relative; margin: 50px auto 2rem;
+    width: var(--modal-w, 520px); max-width: calc(100vw - 2rem);
+    border-radius: .25rem; background: #fff; box-shadow: 0 10px 40px rgba(0,0,0,.2);
+    display: flex; flex-direction: column;
+    max-height: calc(100dvh - 100px);
+    opacity: 0; transform: translateY(-12px);
+    transition: opacity .25s, transform .25s;
+  }
+  .gb-overlay[data-shown] .gb-panel { opacity: 1; transform: translateY(0); }
+  .gb-handle { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-panel, .gb-scrim { transition: none; }
+}
+</style>
+</head>
+
+<body class="font-sans text-black">
+
+<!-- ░░ mockup strip + variant switch — not part of the product ░░ -->
+<div class="sticky top-0 z-[120] bg-neutral-900 text-white">
+  <div class="max-w-screen-desktop container mx-auto flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-2 2xl:px-0">
+    <strong class="text-secondary text-xs font-bold tracking-wider uppercase">Mockup</strong>
+    <span class="text-neutral-400 hidden text-xs lg:inline">Komponenty a triedy sú z gymbeam-fe. Dáta sú zástupné.</span>
+    <div class="ml-auto flex items-center gap-2">
+      <span class="text-neutral-400 hidden text-xs sm:inline">Varianta:</span>
+      <div class="flex rounded border border-neutral-700 p-0.5">
+        <button data-variant="inline" class="variant-btn cursor-pointer rounded px-3 py-1 text-xs font-bold whitespace-nowrap">A · Na stránke</button>
+        <button data-variant="modal"  class="variant-btn cursor-pointer rounded px-3 py-1 text-xs font-bold whitespace-nowrap">B · V modále</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TrustpilotRibbon -->
+<div class="bg-shadow w-full">
+  <div class="max-w-screen-desktop container mx-auto flex items-center justify-center gap-2 px-5 py-1.5 text-xs text-black 2xl:px-0">
+    <span class="font-semibold">Hodnotenie</span>
+    <span class="flex gap-0.5">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+    </span>
+    <span class="font-bold">4,6</span>
+    <span class="text-grey-500 hidden sm:inline">z 12 480 recenzií na Trustpilot</span>
+  </div>
+</div>
+
+<!-- ===========================================================================
+     HEADER → src/components/header/HeaderClient.tsx
+     =========================================================================== -->
+<div id="header-id" class="sticky top-0 left-0 z-[100] flex w-full flex-col bg-white md:static">
+
+  <div class="border-grey-100 hidden w-full border-b md:block">
+    <div class="max-w-screen-desktop container mx-auto flex items-center justify-end gap-x-4 px-5 py-1.5 text-xs md:px-4 2xl:px-0">
+      <a href="#" class="text-grey-500 hover:text-black">Fitness Hub</a>
+      <a href="#" class="text-grey-500 hover:text-black">Blog</a>
+      <a href="#" class="text-grey-500 hover:text-black">Kontakt</a>
+      <button class="text-grey-500 flex cursor-pointer items-center gap-1 hover:text-black">
+        <span class="inline-block h-3 w-4 rounded-[1px] bg-gradient-to-b from-white via-blue-700 to-red-600"></span>
+        SK
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-screen-desktop container mx-auto flex min-h-[40px] flex-col items-center justify-between px-5 pt-2.5 md:min-h-[70px] md:px-4 2xl:px-0">
+
+    <div class="relative flex w-full items-center justify-between md:gap-x-10">
+      <div class="flex items-center gap-x-5">
+        <div class="md:hidden">
+          <button class="relative flex cursor-pointer items-center" aria-label="Menu">
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          </button>
+        </div>
+
+        <!-- HeaderLogo → SvgLogo className="h-[25px] w-full md:h-[40px]" -->
+        <div class="flex justify-start">
+          <a href="#" class="flex items-center justify-center" title="GymBeam" aria-label="Logo">
+            <svg aria-hidden xmlns="http://www.w3.org/2000/svg" width="195" height="38" viewBox="0 0 195 38" fill="none" class="h-[25px] w-auto md:h-[40px]">
+              <g fill="#000" clip-path="url(#gblogo)">
+                <path d="m25.262 14.635-1.348 6.269c-.366 1.692-.847 3.077-1.463 4.173-.616 1.096-1.387 1.942-2.31 2.558-.925.615-2.003 1.038-3.255 1.288-1.251.25-2.695.366-4.332.366H9.396c-1.925 0-3.562-.116-4.91-.366-1.347-.25-2.387-.73-3.138-1.461-.75-.731-1.194-1.77-1.328-3.135-.135-1.366.019-3.154.48-5.385l1.888-8.923c.404-1.942.963-3.577 1.656-4.865.693-1.289 1.502-2.327 2.426-3.096A8.18 8.18 0 0 1 9.512.442a12.962 12.962 0 0 1 3.504-.461h7.586c1.079 0 2.06.115 2.966.346.904.23 1.636.596 2.214 1.115a3.92 3.92 0 0 1 1.194 2c.211.827.192 1.808-.058 2.962l-.462 2.23h-3.273l.346-1.653c.173-.827.231-1.5.154-2.039-.077-.538-.308-.961-.693-1.269-.385-.308-.943-.52-1.694-.635-.751-.115-1.714-.173-2.889-.173h-4.043c-1.56 0-2.83.097-3.812.289-.982.192-1.772.558-2.407 1.115-.635.558-1.136 1.327-1.502 2.308-.366.98-.732 2.27-1.059 3.827l-1.964 9.27c-.308 1.384-.423 2.518-.366 3.384.058.865.328 1.557.79 2.057s1.136.847 2.021 1.02c.886.173 2.003.269 3.37.269h3.08c1.445 0 2.62-.058 3.543-.173.925-.116 1.675-.366 2.272-.75.597-.385 1.06-.923 1.387-1.616.327-.692.635-1.615.885-2.769l.77-3.577H12.17l.616-2.884h12.477ZM29.845 29.058 26.84 8.885h3.12l2.387 17.942h.077L40.82 8.885h3.157L33.542 30.48a94.424 94.424 0 0 1-1.425 2.788 12.296 12.296 0 0 1-1.675 2.423 7.155 7.155 0 0 1-2.234 1.693c-.866.423-1.887.634-3.1.634-.25 0-.481-.019-.693-.057a7.036 7.036 0 0 1-.616-.135l.5-2.385c.309.077.655.116 1.04.116.79 0 1.483-.231 2.041-.693a7.05 7.05 0 0 0 1.483-1.692 17.05 17.05 0 0 0 1.117-2.115M47.925 11.98h.077a6.013 6.013 0 0 1 1.502-1.615 7.558 7.558 0 0 1 1.886-1.038 9.56 9.56 0 0 1 2.06-.539 15.223 15.223 0 0 1 2.022-.153c.636 0 1.233.057 1.868.153.635.097 1.213.27 1.752.52.54.25.982.577 1.329 1.019.346.442.539.98.558 1.654a6.827 6.827 0 0 1 1.675-1.654 8.43 8.43 0 0 1 1.983-1.02c.694-.25 1.406-.422 2.138-.519a16.447 16.447 0 0 1 2.137-.153c1.31 0 2.387.134 3.215.403.828.27 1.464.693 1.887 1.27.424.577.655 1.307.713 2.211.057.904-.058 1.981-.308 3.231l-2.85 13.288h-3.042l2.772-12.98c.174-.847.29-1.577.328-2.212.038-.635-.058-1.154-.27-1.557-.212-.404-.597-.712-1.155-.904-.558-.193-1.31-.289-2.291-.289-1.079 0-2.022.096-2.83.27a5.7 5.7 0 0 0-2.119.903c-.597.423-1.097 1-1.482 1.712-.385.711-.694 1.615-.924 2.692l-2.62 12.366h-3.041l2.888-13.52c.096-.673.192-1.269.25-1.827.058-.557 0-1.019-.212-1.403-.211-.385-.577-.674-1.136-.885-.558-.212-1.386-.308-2.483-.308-2.003 0-3.601.443-4.833 1.346-1.213.904-2.041 2.385-2.484 4.462l-2.58 12.134h-3.042l4.313-20.173h3.042l-.693 3.116ZM81.754.23h15.153c1.444 0 2.695.097 3.793.27 1.097.173 1.964.538 2.638 1.058.674.519 1.117 1.269 1.328 2.25.212.98.154 2.25-.173 3.807-.212.923-.443 1.75-.732 2.5a7.384 7.384 0 0 1-1.097 1.962 5.437 5.437 0 0 1-1.675 1.404c-.674.365-1.483.634-2.465.788l-.077.308c1.06.077 1.868.288 2.465.615.597.327 1.001.789 1.232 1.346.231.558.327 1.231.27 2-.058.77-.174 1.597-.347 2.5-.385 1.77-.886 3.193-1.521 4.25-.636 1.058-1.406 1.866-2.31 2.424-.906.557-1.965.923-3.178 1.096-1.213.173-2.58.269-4.12.269H75.631L81.754.23Zm2.926 22.52h5.815c1.252 0 2.195-.192 2.83-.577.636-.384 1.079-1.173 1.33-2.346.134-.596.172-1.058.134-1.423-.039-.366-.173-.635-.404-.827-.232-.192-.559-.327-.982-.385a11.64 11.64 0 0 0-1.56-.096h-5.969L84.68 22.75Zm2.33-11h5.545c.674 0 1.233-.039 1.675-.115a3.065 3.065 0 0 0 1.117-.404c.29-.192.52-.462.693-.827.174-.365.308-.827.443-1.423a7.59 7.59 0 0 0 .173-1.116c0-.307-.038-.557-.173-.75-.135-.192-.346-.327-.635-.423-.289-.096-.713-.154-1.252-.173h-6.47L87.01 11.75ZM123.267 22.327c-.328 1.538-.828 2.75-1.502 3.654a7.235 7.235 0 0 1-2.465 2.115c-.982.48-2.079.808-3.312.962-1.232.154-2.58.23-4.043.23-2.002 0-3.6-.192-4.794-.557-1.194-.366-2.08-.962-2.638-1.77-.558-.807-.847-1.865-.867-3.172 0-1.308.193-2.904.597-4.808.405-1.943.886-3.577 1.444-4.904.559-1.327 1.271-2.385 2.176-3.192.905-.808 2.022-1.385 3.389-1.731 1.348-.346 3.042-.52 5.083-.52 1.906 0 3.447.154 4.64.462 1.194.308 2.08.846 2.677 1.635.597.788.905 1.846.943 3.173.039 1.327-.154 3.02-.597 5.077l-.231 1.115h-13.112c-.212.904-.327 1.635-.366 2.212-.038.577.019 1.038.193 1.404.173.365.443.615.828.75.385.134.924.211 1.617.211 1.021 0 1.868-.134 2.542-.384.674-.25 1.097-.904 1.309-1.962h6.508-.019Zm-5.353-5.885c.154-.75.212-1.327.154-1.75-.058-.423-.193-.75-.424-.961-.231-.212-.558-.346-.962-.404a10.852 10.852 0 0 0-1.464-.077c-.597 0-1.097.039-1.502.135-.404.096-.77.25-1.059.48-.288.231-.539.558-.731.962-.193.404-.366.942-.52 1.615h6.508ZM137.841 26.058h-.231c-.289.692-.674 1.25-1.174 1.673-.501.423-1.04.75-1.637.98a7.587 7.587 0 0 1-1.868.462c-.654.077-1.27.116-1.829.116-1.155 0-2.175-.078-3.042-.25-.866-.174-1.579-.481-2.099-.943-.519-.461-.866-1.096-1.039-1.923-.174-.827-.116-1.865.173-3.154.25-1.211.635-2.211 1.117-3.038a5.931 5.931 0 0 1 1.81-1.962c.712-.48 1.559-.827 2.503-1.038.943-.212 2.021-.308 3.234-.308.463 0 .982 0 1.541.039.558.019 1.097.096 1.598.23.5.135.924.346 1.29.673.366.327.558.77.616 1.327h.308l.693-3.192c.097-.461.174-.885.212-1.27.039-.384 0-.71-.154-.98-.135-.27-.404-.48-.77-.615s-.924-.212-1.637-.212c-.828 0-1.502.135-2.06.423-.558.289-.924.865-1.136 1.77h-6.623c.327-1.558.847-2.77 1.559-3.616.713-.846 1.54-1.462 2.503-1.846a9.714 9.714 0 0 1 3.139-.673 68.2 68.2 0 0 1 3.465-.096c1.695 0 3.139.077 4.313.25 1.175.173 2.099.519 2.773 1.057.674.539 1.078 1.327 1.213 2.347.135 1.019.039 2.403-.327 4.153l-2.696 12.596h-6.623l.885-3v.02Zm-4.871-4.981c-.597.25-1.001.827-1.213 1.75-.135.538-.116.961.038 1.27.155.307.366.518.636.653.269.135.558.212.886.23.327.02.616.04.866.04.693 0 1.271-.04 1.752-.097.481-.058.867-.173 1.194-.346.327-.173.578-.404.751-.73.173-.328.327-.75.462-1.29.077-.403.058-.75-.058-1a1.102 1.102 0 0 0-.616-.557c-.289-.115-.655-.192-1.097-.23a16.944 16.944 0 0 0-1.464-.058c-.828 0-1.54.115-2.137.365ZM157.885 8.885l-.616 2.846h.27a5.11 5.11 0 0 1 1.213-1.481 5.82 5.82 0 0 1 1.54-.942 7.624 7.624 0 0 1 1.714-.5 10.931 10.931 0 0 1 1.733-.154c.712 0 1.405.038 2.079.134.674.097 1.252.27 1.772.558.52.289.905.673 1.174 1.193.27.519.347 1.211.25 2.076h.309c.231-.711.577-1.326 1.059-1.826a6.562 6.562 0 0 1 1.598-1.231 6.641 6.641 0 0 1 1.867-.693 9.713 9.713 0 0 1 1.945-.211c2.33 0 3.986.52 4.948 1.538.963 1.02 1.194 2.712.674 5.077l-2.926 13.789h-6.624l2.503-11.673c.077-.539.135-1.02.193-1.462.057-.442.038-.827-.058-1.154a1.256 1.256 0 0 0-.597-.769c-.308-.173-.789-.27-1.425-.27-.635 0-1.194.097-1.636.309-.443.211-.828.48-1.117.826-.289.346-.539.75-.732 1.231-.192.48-.346.98-.443 1.52l-2.426 11.442h-6.623l2.618-12.212c.077-.461.135-.885.174-1.27.038-.384 0-.71-.116-.98-.115-.27-.327-.48-.616-.635-.289-.153-.732-.23-1.29-.23-1.367 0-2.31.346-2.869 1.038-.558.692-.963 1.635-1.213 2.846l-2.426 11.443h-6.623l4.313-20.173h6.43ZM187.325.462c.52.307.944.73 1.232 1.269.309.538.443 1.154.443 1.827s-.154 1.269-.443 1.807a3.392 3.392 0 0 1-1.232 1.27c-.52.307-1.117.461-1.79.461a3.569 3.569 0 0 1-1.81-.461 3.306 3.306 0 0 1-1.252-1.27c-.308-.538-.443-1.134-.443-1.807s.154-1.27.443-1.827a3.306 3.306 0 0 1 1.252-1.27 3.569 3.569 0 0 1 1.81-.461c.673 0 1.27.154 1.79.462Zm.251 5.211c.519-.558.789-1.27.789-2.115 0-.846-.27-1.558-.789-2.116-.52-.557-1.214-.827-2.061-.827s-1.559.27-2.079.827c-.52.558-.79 1.27-.79 2.116 0 .846.27 1.577.79 2.115.52.558 1.213.827 2.079.827.867 0 1.541-.27 2.061-.827Zm-.771-2.173a1.235 1.235 0 0 1-.693.385l1.059 1.519h-.905l-.982-1.48h-.404v1.5h-.77v-3.79h1.636c.385 0 .693.097.925.308.231.212.346.481.346.846 0 .289-.077.539-.25.731l.038-.019Zm-1.906-.212h.828c.173 0 .308-.038.404-.115.116-.077.154-.211.154-.365a.46.46 0 0 0-.154-.366.71.71 0 0 0-.404-.115h-.828v.98-.019Z"/>
+              </g>
+              <defs><clipPath id="gblogo"><path fill="#fff" d="M0 0h195v38H0z"/></clipPath></defs>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="hidden flex-1 md:block">
+        <div class="border-grey-100 flex h-10 w-full items-center rounded border bg-white px-4">
+          <input type="search" placeholder="Čo hľadáte?" aria-label="Hľadať" class="placeholder:text-grey-300 flex-1 bg-transparent text-sm outline-none">
+          <svg aria-hidden viewBox="683.8 197.5 33 28" fill="currentColor" class="h-5 w-5 text-black"><path d="m717.1 223.8-13.3-10c.9-1.6 1.5-3.4 1.5-5.3v-.2c0-2.9-1.2-5.6-3.1-7.6-1.9-2-4.6-3.2-7.5-3.2h-.2c-2.9 0-5.6 1.2-7.6 3.1-2 1.9-3.2 4.6-3.2 7.5v.2c0 2.9 1.2 5.6 3.1 7.6 1.9 2 4.6 3.2 7.5 3.2h.2c2.9 0 5.6-1.2 7.6-3.1.2-.2.3-.3.4-.5l13.3 10 1.3-1.7zm-22.5-6.9h-.1c-2.4 0-4.5-1-6-2.6s-2.5-3.7-2.5-6v-.1c0-2.4 1-4.5 2.6-6s3.7-2.5 6-2.5h.1c2.4 0 4.5 1 6 2.6s2.5 3.7 2.5 6v.1c0 1.8-.6 3.6-1.6 4.9l-.2.2c-.2.3-.5.6-.7.8-1.7 1.7-3.8 2.6-6.1 2.6z"/></svg>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end">
+        <div class="flex items-center gap-x-1 md:gap-x-3">
+          <a href="#" class="flex h-full cursor-pointer items-center justify-center text-black hover:bg-transparent" aria-label="Môj účet">
+            <svg aria-hidden viewBox="-112.6 199.2 23 28" class="h-6 w-6" fill="currentColor"><path d="M-91.5 213.4c-.8-1.3-1.8-2.5-3-3.5.5-1 .7-2 .7-3.2 0-2.1-.8-4-2.2-5.3-1.4-1.4-3.3-2.2-5.3-2.2s-4 .8-5.3 2.2c-1.4 1.4-2.2 3.3-2.2 5.3 0 1.1.3 2.2.7 3.2-1.2.9-2.3 2.1-3 3.5-.9 1.7-1.5 3.6-1.5 5.6v8.2h22.7V219c-.2-2-.7-3.9-1.6-5.6zm-13.7-10.4c1-1 2.3-1.6 3.8-1.6s2.8.6 3.8 1.6 1.6 2.3 1.6 3.8c0 1.1-.3 2.1-.8 2.9-.2.3-.4.5-.6.8-.4.4-.8.7-1.3 1-.8.4-1.7.7-2.6.7-1 0-1.8-.2-2.6-.7-.8-.4-1.4-1-1.9-1.8s-.8-1.8-.8-2.9c-.2-1.5.4-2.8 1.4-3.8zm13 22.1h-18.4V219c0-1.7.4-3.2 1.2-4.5.6-1 1.4-2 2.3-2.7.6.7 1.2 1.2 2 1.6 1.1.6 2.3 1 3.7 1 1.3 0 2.6-.3 3.7-1 .8-.4 1.4-1 2-1.6.9.7 1.7 1.7 2.3 2.7.8 1.3 1.2 2.9 1.2 4.5v6.1z"/></svg>
+          </a>
+          <a href="#" class="hidden h-full cursor-pointer items-center justify-center text-black md:flex" aria-label="Obľúbené">
+            <svg aria-hidden viewBox="-1 0 36 28" fill="none" stroke="currentColor" stroke-width="3" class="h-6 w-7"><path d="M24.42.06a9.46,9.46,0,0,0-7.58,2.68A9.27,9.27,0,0,0,9.27.06,9.41,9.41,0,0,0,1,8.53a9.25,9.25,0,0,0,3.48,8L15.05,27.26a2.39,2.39,0,0,0,1.74.74h0a2.43,2.43,0,0,0,1.68-.68L29.16,16.63a9.39,9.39,0,0,0,3.52-8A9.45,9.45,0,0,0,24.42.06Z"/></svg>
+          </a>
+          <a href="#" class="flex h-12 w-fit items-center gap-x-2 hover:bg-transparent" aria-label="Košík">
+            <div class="relative flex items-center lg:mr-3">
+              <svg aria-hidden viewBox="680.7 197.5 39 28" class="h-7 w-7 md:h-6 md:w-8"><path d="m709.9 206-2.8-8.5h-14.2L690 206h-9.3l.5 1.4 6.2 18.1h25.2l6.7-19.5h-9.4zm-15.1 17.4-1-6.5h5v6.5h-4zm-11.1-15.2h6.5l1 6.5h-5.3l-2.2-6.5zm8.8 0h6.4v6.5h-5.4l-1-6.5zm8.5 8.7h5l-1 6.5h-4v-6.5zm0-2.2v-6.5h6.4l-1 6.5H701zm8.6-6.5h6.5l-2.2 6.5h-5.3l1-6.5zm-15.2-8.5h11l2.1 6.3h-15.3l2.2-6.3zm-7.7 17.2h5l1 6.5h-3.8l-2.2-6.5zm24.3 6.5h-3.7l1-6.5h5l-2.3 6.5z" fill="currentColor"/></svg>
+              <div id="cartBadge" class="bg-secondary absolute -right-[14px] -bottom-1 flex h-6 w-6 items-center justify-center rounded-full" style="display:none">
+                <span id="cartCount" class="text-xs text-white">0</span>
+              </div>
+            </div>
+            <span id="cartSum" class="text-sm font-bold whitespace-nowrap" style="display:none">0,00 €</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full md:hidden">
+      <div class="border-grey-100 my-2.5 flex h-10 w-full items-center rounded border bg-white px-4">
+        <input type="search" placeholder="Čo hľadáte?" aria-label="Hľadať" class="placeholder:text-grey-300 flex-1 bg-transparent text-sm outline-none">
+        <svg aria-hidden viewBox="683.8 197.5 33 28" fill="currentColor" class="h-5 w-5"><path d="m717.1 223.8-13.3-10c.9-1.6 1.5-3.4 1.5-5.3v-.2c0-2.9-1.2-5.6-3.1-7.6-1.9-2-4.6-3.2-7.5-3.2h-.2c-2.9 0-5.6 1.2-7.6 3.1-2 1.9-3.2 4.6-3.2 7.5v.2c0 2.9 1.2 5.6 3.1 7.6 1.9 2 4.6 3.2 7.5 3.2h.2c2.9 0 5.6-1.2 7.6-3.1.2-.2.3-.3.4-.5l13.3 10 1.3-1.7zm-22.5-6.9h-.1c-2.4 0-4.5-1-6-2.6s-2.5-3.7-2.5-6v-.1c0-2.4 1-4.5 2.6-6s3.7-2.5 6-2.5h.1c2.4 0 4.5 1 6 2.6s2.5 3.7 2.5 6v.1c0 1.8-.6 3.6-1.6 4.9l-.2.2c-.2.3-.5.6-.7.8-1.7 1.7-3.8 2.6-6.1 2.6z"/></svg>
+      </div>
+    </div>
+
+    <div class="flex w-full flex-wrap">
+      <nav class="max-w-desktop flex w-full">
+        <div id="desktop-nav" class="relative mt-3 hidden w-full flex-wrap md:flex">
+          <div class="group"><a href="#" class="h-full py-4 pl-0 leading-[53px] no-underline hover:no-underline"><span class="font-bold uppercase lg:text-lg">Potraviny</span></a></div>
+          <div class="group"><a href="#" class="h-full px-[15px] py-4 leading-[53px] no-underline hover:no-underline"><span class="font-bold uppercase lg:text-lg">Proteíny</span></a></div>
+          <div class="group"><a href="#" class="h-full px-[15px] py-4 leading-[53px] no-underline hover:no-underline"><span class="font-bold uppercase lg:text-lg">Športová výživa</span></a></div>
+          <div class="group"><a href="#" class="h-full px-[15px] py-4 leading-[53px] no-underline hover:no-underline"><span class="font-bold uppercase lg:text-lg">Oblečenie</span></a></div>
+          <div class="group"><a href="#" class="h-full px-[15px] py-4 leading-[53px] no-underline hover:no-underline"><span class="text-secondary font-bold uppercase lg:text-lg">Príslušenstvo</span></a></div>
+          <div class="group"><a href="#" class="h-full px-[15px] py-4 leading-[53px] no-underline hover:no-underline"><span class="font-bold uppercase lg:text-lg">Top ponuky</span></a></div>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- ===========================================================================
+     PAGE SHELL → src/components/product/ProductPage.astro
+     =========================================================================== -->
+<main class="max-w-screen-desktop container mx-auto px-5 pb-10 2xl:px-0">
+
+  <!-- ProductBreadcrumbs -->
+  <nav aria-label="Breadcrumb" data-size="xs" class="w-full overflow-x-auto bg-white py-4 text-xs text-[color:#a8a69f]">
+    <ul class="breadcrumb flex items-center">
+      <li class="my-1 flex break-keep whitespace-nowrap"><a href="#" class="flex h-full items-center hover:underline"><span class="flex font-semibold">Hlavná stránka</span></a><span class="mx-1.5 flex items-center" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span></li>
+      <li class="my-1 flex break-keep whitespace-nowrap"><a href="#" class="flex h-full items-center hover:underline"><span class="flex font-semibold">Príslušenstvo</span></a><span class="mx-1.5 flex items-center" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span></li>
+      <li class="my-1 flex break-keep whitespace-nowrap"><a href="#" class="flex h-full items-center hover:underline"><span class="flex font-semibold">Ostatné kategórie</span></a><span class="mx-1.5 flex items-center" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span></li>
+      <li class="my-1 flex break-keep whitespace-nowrap"><a href="#" class="flex h-full items-center hover:underline"><span class="flex font-semibold">Diagnostické testy</span></a><span class="mx-1.5 flex items-center" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span></li>
+      <li class="my-1 flex break-keep whitespace-nowrap"><a href="#" class="flex h-full items-center hover:underline"><span class="flex font-semibold">DNA testy</span></a><span class="mx-1.5 flex items-center" aria-hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></span></li>
+      <li class="my-1 flex break-keep whitespace-nowrap"><span class="flex font-semibold text-black">Osobný DNA Test - GymBeam</span></li>
+    </ul>
+  </nav>
+
+  <!-- ProductDetail → "my-4 flex flex-col items-center gap-6 lg:flex-row lg:items-start lg:gap-12" -->
+  <div class="my-4 flex flex-col items-center gap-6 lg:flex-row lg:items-start lg:gap-12">
+
+    <div class="w-full max-w-[440px] lg:max-w-[696px]">
+      <div class="bg-shadow relative flex aspect-[4/3] w-full items-center justify-center rounded">
+        <button class="text-grey-300 absolute top-1/2 left-2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center hover:text-black" aria-label="Predchádzajúci obrázok">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <svg viewBox="0 0 300 170" class="w-3/4" role="img" aria-label="Balenie Osobného DNA testu">
+          <rect x="18" y="30" width="264" height="104" rx="5" fill="#1d2430"/>
+          <rect x="18" y="30" width="264" height="10" fill="#2a3240"/>
+          <g stroke="#ff4100" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M52 44c22 14 22 28 0 42s-22 28 0 42"/>
+            <path d="M92 44c-22 14-22 28 0 42s22 28 0 42"/>
+          </g>
+          <g fill="#ff4100"><circle cx="58" cy="52" r="3"/><circle cx="86" cy="52" r="3"/><circle cx="62" cy="72" r="3"/><circle cx="82" cy="72" r="3"/><circle cx="58" cy="92" r="3"/><circle cx="86" cy="92" r="3"/><circle cx="62" cy="112" r="3"/><circle cx="82" cy="112" r="3"/></g>
+          <text x="190" y="82" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="22" font-weight="900" font-style="italic">GymBeam</text>
+          <text x="190" y="112" text-anchor="middle" fill="#c9ced6" font-family="Inter,sans-serif" font-size="9" font-weight="600" letter-spacing="2.5">DNA COLLECTION KIT</text>
+        </svg>
+        <button class="text-grey-300 absolute top-1/2 right-2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center hover:text-black" aria-label="Ďalší obrázok">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="mt-3 grid grid-cols-4 gap-3">
+        <div class="bg-shadow border-secondary aspect-[4/3] rounded border-2"></div>
+        <div class="bg-shadow border-grey-100 aspect-[4/3] rounded border"></div>
+        <div class="bg-shadow border-grey-100 aspect-[4/3] rounded border"></div>
+        <div class="bg-shadow border-grey-100 aspect-[4/3] rounded border"></div>
+      </div>
+    </div>
+
+    <!-- BUY BOX -->
+    <div class="min-w-0 flex-1">
+      <div class="flex items-start justify-between gap-4">
+        <h1 class="text-2xl leading-tight font-black md:text-[32px]">Osobný DNA Test - GymBeam</h1>
+        <button class="shrink-0 cursor-pointer p-1 text-black" aria-label="Pridať do obľúbených">
+          <svg viewBox="-1 0 36 28" fill="none" stroke="currentColor" stroke-width="3" class="h-6 w-7"><path d="M24.42.06a9.46,9.46,0,0,0-7.58,2.68A9.27,9.27,0,0,0,9.27.06,9.41,9.41,0,0,0,1,8.53a9.25,9.25,0,0,0,3.48,8L15.05,27.26a2.39,2.39,0,0,0,1.74.74h0a2.43,2.43,0,0,0,1.68-.68L29.16,16.63a9.39,9.39,0,0,0,3.52-8A9.45,9.45,0,0,0,24.42.06Z"/></svg>
+        </button>
+      </div>
+
+      <div class="mt-3 flex items-center gap-2 text-sm">
+        <span class="text-secondary flex gap-0.5" aria-hidden>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+        </span>
+        <span class="font-semibold">5.0 <span class="text-grey-500 font-normal">(7)</span></span>
+      </div>
+
+      <p id="heroDesc" class="mt-4 text-sm leading-6">
+        <b class="font-bold">Osobný DNA Test</b> je inovatívny <b class="font-bold">domáci test zo slín</b>, ktorý vám z jedinej vzorky poskytne
+        <b class="font-bold">183 detailných výsledkov</b> z oblasti zdravia, výživy a športu. Vďaka precíznej analýze génov v
+        <b class="font-bold">certifikovanom laboratóriu</b> zistíte, ako vaše telo reaguje na konkrétne potraviny či liečivá, a
+        <b class="font-bold">odhalíte</b> svoj skrytý potenciál. Výsledky dostanete prehľadne spracované vo svojom zákazníckom účte
+        aj s konkrétnymi odporúčaniami, ktoré viete hneď použiť.
+      </p>
+      <button id="heroMore" class="mt-1 cursor-pointer text-sm font-semibold underline">Zobraziť viac</button>
+
+      <div class="mt-7">
+        <p class="text-grey-500 text-sm">Cena od</p>
+        <p class="mt-0.5 text-[32px] leading-none font-black"><span id="priceFrom">199,95 €</span></p>
+        <p class="text-grey-500 mt-1.5 text-sm">za odberovú sadu · balíčky analýz podľa vášho výberu</p>
+      </div>
+
+      <div class="border-grey-100 bg-shadow mt-4 flex items-start gap-3 rounded border p-4">
+        <svg class="text-secondary mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <p class="text-sm leading-6">
+          <b class="font-semibold">Tento produkt si poskladáte sami.</b>
+          V konfigurátore si zvolíte odberovú sadu a balíčky analýz, ktoré vás zaujímajú — platíte len za to, čo si vyberiete.
+        </p>
+      </div>
+
+      <button id="openConfig" class="bg-secondary hover:bg-secondary-strong mt-4 flex h-16 w-full cursor-pointer items-center justify-center gap-4 rounded-sm px-4 text-center text-xl leading-tight font-bold text-white uppercase transition-colors duration-500 ease-in-out">
+        Poskladať si DNA test
+        <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h10M4 17h7"/><circle cx="18" cy="12" r="2.5" fill="currentColor" stroke="none"/><circle cx="15" cy="17" r="2.5" fill="currentColor" stroke="none"/></svg>
+      </button>
+
+      <!-- Running configuration, shown once something is picked (variant B mainly) -->
+      <div id="heroConfig" class="border-secondary mt-3 flex flex-wrap items-center justify-between gap-3 rounded border p-4" style="display:none">
+        <div>
+          <p class="text-grey-300 text-xs font-bold tracking-wider uppercase">Vaša konfigurácia</p>
+          <p id="heroConfigText" class="text-sm font-semibold"></p>
+        </div>
+        <b id="heroConfigPrice" class="text-xl font-black"></b>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+        <div class="flex items-center gap-2.5">
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h10v9H3zM13 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          <a href="#" class="underline">Doručenie: od 1,90 €</a>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14H7"/></svg>
+          <a href="#" class="underline">Vrátenie tovaru zadarmo</a>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h10v9H3zM13 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/><path d="m8 10 1.5 1.5L12 9"/></svg>
+          <span>Doručenie zdarma</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <svg class="text-success-strong h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          <a href="#" class="flex items-center gap-1 underline">Môžete mať <b class="font-bold">pondelok 19. 10.</b>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================================
+       KONFIGURÁTOR — the four parts below are relocated into #cfgModal in variant B.
+       Moving the nodes keeps one DOM, one state and one set of listeners.
+       =========================================================================== -->
+  <section id="cfgInline" class="border-grey-100 mt-10 scroll-mt-24 overflow-hidden rounded border">
+
+    <div id="cfgHead" class="px-5 pt-6 md:px-8 md:pt-8">
+      <p class="text-secondary text-xs font-bold tracking-widest uppercase">Konfigurátor</p>
+      <h2 class="mt-1.5 text-xl font-black md:text-2xl">Poskladajte si svoj DNA test</h2>
+      <p class="text-grey-500 mt-1 max-w-[70ch] text-sm leading-6">
+        Jedna vzorka slín, ľubovoľná kombinácia balíčkov. Vyberte si len tie oblasti, ktoré vás naozaj zaujímajú — a priplatíte si len za ne.
+      </p>
+    </div>
+
+    <div id="cfgSteps" class="border-grey-100 mt-5 flex w-full overflow-x-auto border-b px-5 md:px-8" role="tablist" aria-label="Kroky konfigurátora">
+      <button data-step="1" role="tab" class="step-tab relative flex shrink-0 items-center gap-2.5 border-b-2 border-transparent bg-transparent py-4 pr-8 text-sm font-bold text-black uppercase">
+        <span class="step-num bg-grey-100 text-grey-500 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">1</span>
+        <span class="flex flex-col items-start"><span>Odberová sada</span><span id="hint-1" class="text-grey-300 text-xs font-normal normal-case">Nevybrané</span></span>
+      </button>
+      <button data-step="2" role="tab" class="step-tab relative flex shrink-0 items-center gap-2.5 border-b-2 border-transparent bg-transparent py-4 pr-8 text-sm font-bold text-black uppercase">
+        <span class="step-num bg-grey-100 text-grey-500 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">2</span>
+        <span class="flex flex-col items-start"><span>Balíčky analýz</span><span id="hint-2" class="text-grey-300 text-xs font-normal normal-case">0 vybraných</span></span>
+      </button>
+      <button data-step="3" role="tab" class="step-tab relative flex shrink-0 items-center gap-2.5 border-b-2 border-transparent bg-transparent py-4 text-sm font-bold text-black uppercase">
+        <span class="step-num bg-grey-100 text-grey-500 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">3</span>
+        <span class="flex flex-col items-start"><span>Sumár</span><span id="hint-3" class="text-grey-300 text-xs font-normal normal-case">Kontrola a košík</span></span>
+      </button>
+    </div>
+
+    <div id="cfgPanels">
+      <!-- STEP 1 -->
+      <div data-step-panel="1" class="cfg-panel px-5 py-7 md:px-8 md:py-8">
+        <h3 class="text-lg font-bold">Potrebujete odberovú sadu?</h3>
+        <p class="text-grey-500 mt-1.5 mb-6 max-w-[72ch] text-sm leading-6">
+          Odberová sada je fyzická krabička so sterilnou tyčinkou a skúmavkou. Ak už DNA test GymBeam máte,
+          vzorku odoberať znova nemusíte — stačí si dokúpiť ďalšie balíčky analýz.
+        </p>
+        <div id="kitGroup" class="grid grid-cols-1 gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Odberová sada"></div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div data-step-panel="2" class="cfg-panel px-5 py-7 md:px-8 md:py-8">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold">Vyberte si balíčky analýz</h3>
+            <p class="text-grey-500 mt-1.5 max-w-[72ch] text-sm leading-6">
+              Vyberte si ľubovoľný počet balíčkov naprieč kategóriami. Každý balíček rozšíri vašu analýzu
+              o ďalšie parametre z tej istej vzorky.
+            </p>
+          </div>
+          <button id="skipPackages" class="shrink-0 cursor-pointer rounded border-2 border-black px-5 py-2.5 text-xs leading-normal font-bold whitespace-nowrap text-black uppercase transition-colors duration-500 ease-in-out hover:bg-black hover:text-white" style="display:none">
+            Pokračovať bez balíčka
+          </button>
+        </div>
+
+        <div class="border-grey-100 bg-shadow mt-5 flex items-start gap-3 rounded border p-4">
+          <svg class="text-secondary mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          <p class="text-sm leading-6">
+            <b class="font-semibold">Ku každému balíčku dostanete vlastný aktivačný kód.</b>
+            Kódy nájdete v potvrdzovacom e-maile aj vo svojom účte — zadáte ich v sekcii „Moje výsledky DNA testu“
+            a tým balíček priradíte k svojej vzorke.
+          </p>
+        </div>
+
+        <div id="pkgSections" class="mt-7"></div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div data-step-panel="3" class="cfg-panel px-5 py-7 md:px-8 md:py-8">
+        <h3 class="text-lg font-bold">Sumár vašej konfigurácie</h3>
+        <p class="text-grey-500 mt-1.5 mb-6 max-w-[72ch] text-sm leading-6">
+          Skontrolujte si výber. Čokoľvek viete ešte zmeniť — stačí sa vrátiť na predchádzajúci krok
+          alebo položku upraviť priamo tu.
+        </p>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_340px] md:gap-8">
+          <div>
+            <div id="sumList" class="border-grey-100 rounded border"></div>
+            <button data-goto="2" class="text-grey-500 mt-4 cursor-pointer text-sm font-semibold underline hover:text-black">+ Pridať ďalší balíček</button>
+
+            <div id="codeNotice" class="border-grey-100 bg-shadow mt-5 flex items-start gap-3 rounded border p-4" style="display:none">
+              <svg class="text-secondary mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+              <p class="text-sm leading-6"><span id="codeNoticeText"></span></p>
+            </div>
+          </div>
+
+          <aside class="border-grey-100 self-start rounded border p-5 md:sticky md:top-6" aria-label="Cenový súhrn">
+            <h4 class="text-xs font-bold tracking-widest uppercase">Váš výber</h4>
+            <div id="sumLines" class="mt-4"></div>
+
+            <div class="my-4 flex items-center justify-between gap-3">
+              <span class="text-grey-500 text-sm">Počet konfigurácií</span>
+              <div class="relative flex w-30 items-center">
+                <button type="button" id="qtyMinus" aria-label="Znížiť počet" class="disabled:text-grey-200 absolute left-1 z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14"/></svg>
+                </button>
+                <input id="qtyInput" type="number" value="1" min="1" max="20" aria-label="Počet konfigurácií"
+                  class="qty-input h-9.5 w-full rounded border-2 border-solid border-black px-7 py-1 text-center font-bold focus:rounded focus:shadow-none focus:outline-none">
+                <button type="button" id="qtyPlus" aria-label="Zvýšiť počet" class="disabled:text-grey-200 absolute right-1 z-10 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="border-grey-100 mt-4 flex items-baseline justify-between gap-3 border-t pt-4">
+              <span class="font-semibold">Spolu</span>
+              <b id="sumTotal" class="text-2xl font-black">0,00 €</b>
+            </div>
+            <p class="text-grey-300 mt-0.5 text-right text-xs">vrátane DPH</p>
+
+            <button id="addToCart" class="bg-secondary hover:bg-secondary-hover mt-4 flex h-16 w-full cursor-pointer items-center justify-center gap-4 rounded-sm px-4 py-1 text-center text-xl leading-tight font-bold text-white uppercase transition-colors duration-500 ease-in-out disabled:pointer-events-none disabled:opacity-60">
+              Pridať do košíka
+              <svg class="h-6 w-7 shrink-0" viewBox="680.7 197.5 39 28" fill="currentColor"><path d="m709.9 206-2.8-8.5h-14.2L690 206h-9.3l.5 1.4 6.2 18.1h25.2l6.7-19.5h-9.4zm-15.1 17.4-1-6.5h5v6.5h-4zm-11.1-15.2h6.5l1 6.5h-5.3l-2.2-6.5zm8.8 0h6.4v6.5h-5.4l-1-6.5zm8.5 8.7h5l-1 6.5h-4v-6.5zm0-2.2v-6.5h6.4l-1 6.5H701zm8.6-6.5h6.5l-2.2 6.5h-5.3l1-6.5zm-15.2-8.5h11l2.1 6.3h-15.3l2.2-6.3zm-7.7 17.2h5l1 6.5h-3.8l-2.2-6.5zm24.3 6.5h-3.7l1-6.5h5l-2.3 6.5z"/></svg>
+            </button>
+            <button data-goto="2" class="text-grey-500 mt-3 w-full cursor-pointer text-sm font-semibold underline hover:text-black">Späť na balíčky</button>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div id="cfgBar" class="border-grey-100 sticky bottom-0 z-30 flex flex-wrap items-center gap-4 border-t bg-white px-5 py-3.5 shadow-[0_-6px_18px_rgba(0,0,0,0.06)] md:px-8 md:py-4">
+      <div class="flex flex-col leading-tight">
+        <small class="text-grey-300 text-xs font-bold tracking-wider uppercase">Spolu</small>
+        <b id="barTotal" class="text-xl font-black">0,00 €</b>
+      </div>
+      <div id="barPicked" class="text-grey-300 order-3 min-w-[120px] flex-1 basis-full text-xs sm:order-none sm:basis-auto">Zatiaľ nič nevybrané</div>
+      <div class="ml-auto flex w-full gap-2.5 sm:w-auto">
+        <button id="btnBack" class="flex h-12 flex-1 cursor-pointer items-center justify-center truncate rounded border-2 border-black px-6 leading-normal font-bold whitespace-nowrap text-black uppercase transition-colors duration-500 ease-in-out hover:bg-black hover:text-white sm:flex-none sm:px-14" style="display:none">
+          Späť
+        </button>
+        <button id="btnNext" class="bg-secondary hover:bg-secondary-strong flex h-12 flex-1 cursor-pointer items-center justify-center truncate rounded px-6 leading-normal font-bold whitespace-nowrap text-white uppercase transition-colors duration-500 ease-in-out disabled:pointer-events-none disabled:opacity-60 sm:flex-none sm:px-14">
+          Ďalej
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div id="pdp-tabs" class="mt-12 mb-4 flex w-full flex-col lg:mb-0 lg:flex-row lg:flex-wrap lg:justify-between lg:gap-0">
+
+    <a href="#description" data-pdp-tab-trigger="description">
+      <div data-pdp-tab="description" class="relative flex h-auto cursor-pointer items-center justify-between bg-transparent py-4 text-base font-bold text-black uppercase max-md:border-b max-md:border-b-gray-200 max-md:pl-2.5 md:h-auto md:justify-center md:rounded-none md:border-b-2 md:border-transparent md:px-4 md:py-3 md:text-sm md:whitespace-nowrap">
+        Popis
+        <svg data-pdp-tab-chevron="" class="hidden h-6 w-6 shrink-0 rotate-180 transition-all max-md:inline-flex" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg>
+      </div>
+    </a>
+    <section id="description" data-pdp-tab-panel="" data-pdp-tab-default="" class="pt-2 lg:pt-0">
+      <div class="bg-shadow rounded px-6 py-12 text-center md:px-12 md:py-16">
+        <h2 class="mx-auto mb-5 max-w-[24ch] text-2xl leading-tight font-black md:text-4xl">
+          Osobný DNA Test<br>návod k svojmu telu z jedinej vzorky slín
+        </h2>
+        <p class="mx-auto max-w-[70ch] text-[15px] leading-7">
+          <b class="font-bold">Osobný DNA Test</b> je špičkový domáci test zo slín, ktorý vám z <b class="font-bold">jedinej vzorky</b>
+          sprostredkuje ucelený pohľad na vaše genetické predispozície – s <b class="font-bold">dôrazom na presnosť, zrozumiteľnosť
+          a maximálnu bezpečnosť dát</b>. S <b class="font-bold">183 analyzovanými parametrami</b> rozdelenými do
+          <b class="font-bold">13 prehľadných kategórií</b> získate detailný manuál k svojmu vlastnému telu. Či už je vaším cieľom
+          <b class="font-bold">zlepšenie športového výkonu</b>, efektívna úprava jedálnička, <b class="font-bold">podpora dlhovekosti (longevity)</b>
+          alebo <b class="font-bold">proaktívny prístup k zdraviu</b>, dostanete do rúk tvrdé dáta podložené vedou.
+        </p>
+        <svg viewBox="0 0 520 170" class="mx-auto mt-9 w-full max-w-[520px]" role="img" aria-label="Ilustrácia balenia DNA testu">
+          <rect x="60" y="40" width="150" height="110" rx="5" fill="#1d2430"/>
+          <rect x="60" y="40" width="150" height="16" fill="#2a3240"/>
+          <text x="135" y="98" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="17" font-weight="900" font-style="italic">GymBeam</text>
+          <text x="135" y="118" text-anchor="middle" fill="#c9ced6" font-family="Inter,sans-serif" font-size="8" font-weight="600" letter-spacing="2">DNA COLLECTION KIT</text>
+          <rect x="250" y="55" width="130" height="95" rx="5" fill="#242c38"/>
+          <text x="315" y="108" text-anchor="middle" fill="#ff4100" font-family="Inter,sans-serif" font-size="11" font-weight="700" letter-spacing="1.5">183 PARAMETROV</text>
+          <g stroke="#ff4100" stroke-width="3.6" fill="none" stroke-linecap="round">
+            <path d="M420 34c18 16 18 32 0 48s-18 32 0 48"/><path d="M462 34c-18 16-18 32 0 48s18 32 0 48"/>
+          </g>
+          <g stroke="#ffa080" stroke-width="2.6" stroke-linecap="round"><path d="M424 50h34"/><path d="M421 82h40"/><path d="M424 114h34"/></g>
+        </svg>
+      </div>
+
+      <div class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="border-grey-100 rounded border p-5">
+          <svg class="text-secondary mb-3 h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 5c5 3 5 5 10 8M17 5c-5 3-5 5-10 8"/></svg>
+          <h5 class="mb-1.5 text-sm font-bold">Jedna vzorka, veľa odpovedí</h5>
+          <p class="text-grey-500 text-sm">Odoberiete raz a balíčky si viete dokupovať aj mesiace po teste.</p>
+        </div>
+        <div class="border-grey-100 rounded border p-5">
+          <svg class="text-secondary mb-3 h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.4 8.4-8 9-4.6-.6-8-4-8-9V7z"/><path d="m9 12 2 2 4-4"/></svg>
+          <h5 class="mb-1.5 text-sm font-bold">Dáta pod jedinečným ID</h5>
+          <p class="text-grey-500 text-sm">V laboratóriu nie je vzorka nijako spojená s vaším menom.</p>
+        </div>
+        <div class="border-grey-100 rounded border p-5">
+          <svg class="text-secondary mb-3 h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <h5 class="mb-1.5 text-sm font-bold">Výsledky do 4–6 týždňov</h5>
+          <p class="text-grey-500 text-sm">O dokončení analýzy vás upozorníme e-mailom aj v účte.</p>
+        </div>
+        <div class="border-grey-100 rounded border p-5">
+          <svg class="text-secondary mb-3 h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          <h5 class="mb-1.5 text-sm font-bold">Zrozumiteľný výstup</h5>
+          <p class="text-grey-500 text-sm">Žiadne surové dáta — konkrétne odporúčania v slovenčine.</p>
+        </div>
+      </div>
+    </section>
+
+    <a href="#detail" data-pdp-tab-trigger="detail">
+      <div data-pdp-tab="detail" class="relative flex h-auto cursor-pointer items-center justify-between bg-transparent py-4 text-base font-bold text-black uppercase max-md:border-b max-md:border-b-gray-200 max-md:pl-2.5 md:h-auto md:justify-center md:rounded-none md:border-b-2 md:border-transparent md:px-4 md:py-3 md:text-sm md:whitespace-nowrap">
+        Detail produktu
+        <svg data-pdp-tab-chevron="" class="hidden h-6 w-6 shrink-0 rotate-180 transition-all max-md:inline-flex" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg>
+      </div>
+    </a>
+    <section id="detail" data-pdp-tab-panel="" class="pt-2 lg:pt-0">
+      <table class="w-full max-w-[640px] border-collapse text-sm">
+        <tbody>
+          <tr class="border-grey-100 border-b"><th class="text-grey-500 w-[45%] py-3 text-left align-top font-semibold">Typ odberu</th><td class="py-3 align-top">Sterilná tyčinka, vzorka slín</td></tr>
+          <tr class="border-grey-100 border-b"><th class="text-grey-500 py-3 text-left align-top font-semibold">Počet parametrov</th><td class="py-3 align-top">183 naprieč všetkými balíčkami</td></tr>
+          <tr class="border-grey-100 border-b"><th class="text-grey-500 py-3 text-left align-top font-semibold">Kategórie</th><td class="py-3 align-top">13</td></tr>
+          <tr class="border-grey-100 border-b"><th class="text-grey-500 py-3 text-left align-top font-semibold">Doba spracovania</th><td class="py-3 align-top">4–6 týždňov od doručenia vzorky do laboratória</td></tr>
+          <tr class="border-grey-100 border-b"><th class="text-grey-500 py-3 text-left align-top font-semibold">Aktivácia balíčka</th><td class="py-3 align-top">Unikátny aktivačný kód ku každému balíčku, zadáva sa v zákazníckom účte</td></tr>
+          <tr class="border-grey-100 border-b"><th class="text-grey-500 py-3 text-left align-top font-semibold">Likvidácia vzorky</th><td class="py-3 align-top">Do 90 dní od analýzy</td></tr>
+          <tr><th class="text-grey-500 py-3 text-left align-top font-semibold">Vhodné od</th><td class="py-3 align-top">18 rokov</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <a href="#reviews" data-pdp-tab-trigger="reviews">
+      <div data-pdp-tab="reviews" class="relative flex h-auto cursor-pointer items-center justify-between bg-transparent py-4 text-base font-bold text-black uppercase max-md:border-b max-md:border-b-gray-200 max-md:pl-2.5 md:h-auto md:justify-center md:rounded-none md:border-b-2 md:border-transparent md:px-4 md:py-3 md:text-sm md:whitespace-nowrap">
+        Recenzie
+        <span class="bg-secondary ml-1 hidden items-center justify-center rounded-full font-normal text-white md:inline-flex md:h-5 md:w-auto md:min-w-5 md:px-1 md:text-xs">7</span>
+        <svg data-pdp-tab-chevron="" class="hidden h-6 w-6 shrink-0 rotate-180 transition-all max-md:inline-flex" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg>
+      </div>
+    </a>
+    <section id="reviews" data-pdp-tab-panel="" class="pt-2 lg:pt-0">
+      <div class="border-grey-100 max-w-[760px] border-b py-5">
+        <div class="mb-2 flex flex-wrap items-center gap-2.5">
+          <span class="text-secondary flex gap-0.5" aria-hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg></span>
+          <b class="text-sm">Martin K.</b><span class="text-success-strong inline-flex items-center gap-1 text-xs font-semibold">✓ overený nákup</span><span class="text-grey-300 text-xs">12. 9. 2026</span>
+        </div>
+        <p class="text-grey-500 text-sm">Konečne test, kde výsledky pochopí aj normálny človek. Športová časť mi dala zmysel — vysvetlilo to, prečo mi dlhé behy sedia viac ako šprinty.</p>
+      </div>
+      <div class="border-grey-100 max-w-[760px] border-b py-5">
+        <div class="mb-2 flex flex-wrap items-center gap-2.5">
+          <span class="text-secondary flex gap-0.5" aria-hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg></span>
+          <b class="text-sm">Lucia H.</b><span class="text-success-strong inline-flex items-center gap-1 text-xs font-semibold">✓ overený nákup</span><span class="text-grey-300 text-xs">3. 9. 2026</span>
+        </div>
+        <p class="text-grey-500 text-sm">Odber doma za dve minúty, výsledky prišli o päť týždňov. Najviac ma prekvapila časť o vstrebávaní vitamínu D.</p>
+      </div>
+      <div class="max-w-[760px] py-5">
+        <div class="mb-2 flex flex-wrap items-center gap-2.5">
+          <span class="text-secondary flex gap-0.5" aria-hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg></span>
+          <b class="text-sm">Peter V.</b><span class="text-success-strong inline-flex items-center gap-1 text-xs font-semibold">✓ overený nákup</span><span class="text-grey-300 text-xs">28. 8. 2026</span>
+        </div>
+        <p class="text-grey-500 text-sm">Spokojnosť. Oceňujem, že si viem dokúpiť len tie oblasti, ktoré ma zaujímajú, a nemusím platiť za celý balík.</p>
+      </div>
+    </section>
+
+    <a href="#qa" data-pdp-tab-trigger="qa">
+      <div data-pdp-tab="qa" class="relative flex h-auto cursor-pointer items-center justify-between bg-transparent py-4 text-base font-bold text-black uppercase max-md:border-b max-md:border-b-gray-200 max-md:pl-2.5 md:h-auto md:justify-center md:rounded-none md:border-b-2 md:border-transparent md:px-4 md:py-3 md:text-sm md:whitespace-nowrap">
+        Otázky
+        <svg data-pdp-tab-chevron="" class="hidden h-6 w-6 shrink-0 rotate-180 transition-all max-md:inline-flex" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg>
+      </div>
+    </a>
+    <section id="qa" data-pdp-tab-panel="" class="pt-2 lg:pt-0">
+      <div class="border-grey-100 max-w-[760px] border-b py-4">
+        <p class="mb-2 flex gap-2.5 font-semibold"><span class="text-secondary shrink-0 font-black">Q</span>Môžem si balíčky dokúpiť aj potom, ako mi prídu výsledky?</p>
+        <p class="text-grey-500 flex gap-2.5 text-sm"><span class="text-grey-200 shrink-0 font-black">A</span>Áno. Vzorku odoberáte iba raz — ďalšie balíčky sa vyhodnotia z tej istej vzorky, pokiaľ nebola zlikvidovaná (90 dní od analýzy).</p>
+      </div>
+      <div class="border-grey-100 max-w-[760px] border-b py-4">
+        <p class="mb-2 flex gap-2.5 font-semibold"><span class="text-secondary shrink-0 font-black">Q</span>Ako aktivujem zakúpený balíček?</p>
+        <p class="text-grey-500 flex gap-2.5 text-sm"><span class="text-grey-200 shrink-0 font-black">A</span>Ku každému balíčku dostanete samostatný aktivačný kód. Zadáte ho vo svojom účte v sekcii „Moje výsledky DNA testu“ a balíček sa priradí k vašej vzorke.</p>
+      </div>
+      <div class="max-w-[760px] py-4">
+        <p class="mb-2 flex gap-2.5 font-semibold"><span class="text-secondary shrink-0 font-black">Q</span>Je test lekárskou diagnostikou?</p>
+        <p class="text-grey-500 flex gap-2.5 text-sm"><span class="text-grey-200 shrink-0 font-black">A</span>Nie. Test odhaľuje genetické predispozície a nenahrádza odborné lekárske vyšetrenie.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- FOOTER → src/components/footer/FooterClient.tsx -->
+<footer id="page_footer" class="mt-16 bg-black text-white">
+  <div class="max-w-screen-desktop container w-full px-6 py-8 md:mx-auto md:py-10 2xl:px-0">
+    <div class="md:grid-cols-footer-blocks grid grid-cols-1 gap-8">
+
+      <div class="footer-block documents text-sm">
+        <h4 class="text-base">Informácie</h4>
+        <ul class="list-none p-0">
+          <li><a href="#">O nás</a></li><li><a href="#">Obchodné podmienky</a></li>
+          <li><a href="#">Reklamačný poriadok</a></li><li><a href="#">Ochrana osobných údajov</a></li>
+          <li><a href="#">Vrátenie tovaru</a></li><li><a href="#">Doprava a platba</a></li>
+          <li><a href="#">Vernostný program</a></li>
+        </ul>
+        <div class="mt-6 hidden md:block">
+          <button class="border-grey-600 flex items-center gap-2 rounded border px-3 py-2 text-sm">
+            <span class="inline-block h-3 w-4 rounded-[1px] bg-gradient-to-b from-white via-blue-700 to-red-600"></span>
+            GymBeam.sk
+            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="footer-block social text-sm">
+        <div>
+          <h4 class="text-base">Sledujte nás</h4>
+          <ul class="list-none p-0">
+            <li><a href="#" aria-label="Facebook"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1Z"/></svg></a></li>
+            <li><a href="#" aria-label="Instagram"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a></li>
+            <li><a href="#" aria-label="YouTube"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12s0-3.4-.4-5c-.2-.9-.9-1.6-1.8-1.8C18.2 4.8 12 4.8 12 4.8s-6.2 0-7.8.4c-.9.2-1.6.9-1.8 1.8C2 8.6 2 12 2 12s0 3.4.4 5c.2.9.9 1.6 1.8 1.8 1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4c.9-.2 1.6-.9 1.8-1.8.4-1.6.4-5 .4-5ZM10 15.2V8.8l5.2 3.2-5.2 3.2Z"/></svg></a></li>
+            <li><a href="#" aria-label="TikTok"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M16 3c.4 2 1.8 3.5 4 3.8V10c-1.6 0-3-.5-4-1.3V15a6 6 0 1 1-6-6v3a3 3 0 1 0 3 3V3h3Z"/></svg></a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-base">Zákaznícka podpora</h4>
+          <p class="text-grey-200">Po – Pia, 08:00 – 20:00</p>
+          <p><a href="tel:+421233057087" class="font-bold">+421 2 33 057 087</a></p>
+          <p><a href="mailto:info@gymbeam.sk" class="font-bold">info@gymbeam.sk</a></p>
+        </div>
+        <div>
+          <h4 class="text-base">Fitness Hub Košice</h4>
+          <p class="text-grey-200">Rastislavova 93, 040 01 Košice</p>
+        </div>
+      </div>
+
+      <div class="footer-block contact-us flex flex-col gap-4 text-sm">
+        <div>
+          <h4 class="text-base">Odoberajte novinky</h4>
+          <form class="flex gap-2" onsubmit="return false">
+            <input type="email" placeholder="Váš e-mail" aria-label="Váš e-mail" class="border-grey-600 placeholder:text-grey-400 h-12 min-w-0 flex-1 rounded border bg-black px-4 text-sm text-white outline-none">
+            <button class="bg-secondary hover:bg-secondary-strong flex h-12 cursor-pointer items-center justify-center rounded px-6 text-sm font-bold text-white uppercase transition-colors duration-500 ease-in-out">Odoberať</button>
+          </form>
+          <p class="text-grey-400 mt-2 text-xs">Odoslaním súhlasíte so spracovaním osobných údajov.</p>
+        </div>
+        <div class="footer-block certification">
+          <h4 class="text-base">Platba a doprava</h4>
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="flex h-8 w-14 items-center justify-center rounded bg-white text-[10px] font-black text-blue-900">VISA</span>
+            <span class="flex h-8 w-14 items-center justify-center rounded bg-white text-[10px] font-black text-red-600">MC</span>
+            <span class="flex h-8 w-14 items-center justify-center rounded bg-white text-[10px] font-black text-black">GPay</span>
+            <span class="flex h-8 w-16 items-center justify-center rounded bg-white text-[10px] font-black text-yellow-600">Packeta</span>
+            <span class="flex h-8 w-14 items-center justify-center rounded bg-white text-[10px] font-black text-red-700">DPD</span>
+          </div>
+        </div>
+        <div class="mt-auto">
+          <div class="hidden max-w-sm items-center justify-between md:flex">
+            <span class="text-sm whitespace-nowrap">© 2026 GymBeam s.r.o.</span>
+            <button class="border-grey-600 flex items-center gap-2 rounded border px-3 py-1.5 text-xs" aria-label="Prepnúť kontrastný režim">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>
+              Kontrast
+            </button>
+          </div>
+          <div class="flex flex-col gap-4 md:hidden">
+            <span class="text-sm whitespace-nowrap">© 2026 GymBeam s.r.o.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===========================================================================
+     CONFIGURATOR OVERLAY (variant B) — host for the relocated configurator.
+     Bottom sheet under 1024px, centered modal above. See the .gb-* rules.
+     =========================================================================== -->
+<div id="cfgModal" class="gb-overlay" style="--modal-w:980px; --sheet-max:95dvh" role="dialog" aria-modal="true" aria-label="Konfigurátor DNA testu">
+  <div class="gb-scrim" data-close></div>
+  <div class="gb-panel">
+    <!-- drag handle, mobile only — BottomModalContent showDragHandle -->
+    <div class="gb-handle justify-center pt-3 pb-2" data-swipe>
+      <div class="h-1 w-12 rounded-full bg-gray-300"></div>
+    </div>
+
+    <div class="shrink-0" data-swipe>
+      <div class="flex items-start justify-between gap-4 px-4 pt-1 md:px-6 md:pt-5">
+        <div id="cfgHeadSlot" class="min-w-0 flex-1"></div>
+        <button data-close class="text-grey-300 shrink-0 cursor-pointer rounded p-1 hover:text-black" aria-label="Zavrieť konfigurátor">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="cfgStepsSlot"></div>
+    </div>
+
+    <div id="cfgBodySlot" class="min-h-0 flex-1 overflow-y-auto overscroll-contain"></div>
+    <div id="cfgFooterSlot" class="shrink-0 border-t border-gray-200 bg-white"></div>
+  </div>
+</div>
+
+<!-- ===========================================================================
+     PACKAGE DETAIL OVERLAY — same bottom-sheet / modal behaviour
+     =========================================================================== -->
+<div id="pkgModal" class="gb-overlay" style="--modal-w:600px; --sheet-max:88dvh" role="dialog" aria-modal="true" aria-labelledby="pkgModalTitle">
+  <div class="gb-scrim" data-close></div>
+  <div class="gb-panel">
+    <div class="gb-handle justify-center pt-3 pb-2" data-swipe>
+      <div class="h-1 w-12 rounded-full bg-gray-300"></div>
+    </div>
+
+    <div class="border-grey-100 flex shrink-0 items-start justify-between gap-4 border-b px-5 pt-2 pb-4 md:px-6 md:pt-5 md:pb-5" data-swipe>
+      <div class="min-w-0">
+        <p id="pkgModalCat" class="text-grey-300 text-xs font-bold tracking-widest uppercase"></p>
+        <h3 id="pkgModalTitle" class="mt-1 text-xl font-black"></h3>
+      </div>
+      <button data-close class="text-grey-300 shrink-0 cursor-pointer rounded p-1 hover:text-black" aria-label="Zavrieť">
+        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 md:px-6">
+      <div id="pkgModalArt" class="bg-shadow mb-5 flex h-36 items-center justify-center rounded"></div>
+      <p id="pkgModalDesc" class="text-grey-500 text-sm leading-6"></p>
+
+      <h4 class="mt-6 text-xs font-bold tracking-widest uppercase">Čo balíček analyzuje</h4>
+      <ul id="pkgModalList" class="mt-3 grid gap-2.5"></ul>
+
+      <div class="border-grey-100 bg-shadow mt-6 flex items-start gap-3 rounded border p-4">
+        <svg class="text-secondary mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="10" width="18" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <p class="text-sm leading-6">K tomuto balíčku dostanete <b class="font-semibold">vlastný aktivačný kód</b>, ktorý zadáte vo svojom účte.</p>
+      </div>
+    </div>
+
+    <div class="border-grey-100 flex shrink-0 items-center justify-between gap-4 border-t px-5 py-4 md:px-6">
+      <div>
+        <p class="text-grey-300 text-xs font-semibold tracking-wider uppercase"><span id="pkgModalParams"></span></p>
+        <p id="pkgModalPrice" class="text-xl font-black"></p>
+      </div>
+      <button id="pkgModalToggle" class="flex h-12 cursor-pointer items-center justify-center rounded px-6 leading-normal font-bold whitespace-nowrap uppercase transition-colors duration-500 ease-in-out sm:px-8"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-7 left-1/2 z-[300] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 translate-y-[150%] items-center gap-3 rounded bg-black px-5 py-3.5 text-sm text-white shadow-2xl transition-transform duration-300" role="status" aria-live="polite">
+  <svg class="text-success h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m4 12 6 6L20 6"/></svg>
+  <span id="toastText">Pridané do košíka</span>
+</div>
+
+<script>
+/* ===========================================================================
+   DATA — swap this block for real Magento products.
+   =========================================================================== */
+const ART = {
+  kit:   '<svg viewBox="0 0 160 110" class="h-24 w-auto"><rect x="6" y="14" width="148" height="80" rx="4" fill="#1d2430"/><rect x="6" y="14" width="148" height="8" fill="#2a3240"/><g stroke="#ff4100" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M28 26c14 10 14 20 0 30s-14 20 0 30"/><path d="M54 26c-14 10-14 20 0 30s14 20 0 30"/></g><text x="108" y="56" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="15" font-weight="900" font-style="italic">GymBeam</text><text x="108" y="74" text-anchor="middle" fill="#c9ced6" font-family="Inter,sans-serif" font-size="6" font-weight="600" letter-spacing="1.6">DNA COLLECTION KIT</text></svg>',
+  have:  '<svg viewBox="0 0 120 120" class="h-24 w-24"><circle cx="60" cy="60" r="38" fill="none" stroke="#dfdedd" stroke-width="3"/><path d="m44 61 12 12 22-24" fill="none" stroke="#567b24" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><g stroke="#a8a69f" stroke-width="2" fill="none" stroke-linecap="round"><path d="M22 34c6 5 6 11 0 16"/><path d="M98 70c-6 5-6 11 0 16"/></g></svg>',
+  sport: '<svg viewBox="0 0 120 90" class="h-16 w-20"><path d="M22 45h76" stroke="#ff4100" stroke-width="5" stroke-linecap="round"/><rect x="12" y="32" width="14" height="26" rx="3" fill="#1a1a1a"/><rect x="94" y="32" width="14" height="26" rx="3" fill="#1a1a1a"/><rect x="28" y="38" width="9" height="14" rx="2" fill="#575757"/><rect x="83" y="38" width="9" height="14" rx="2" fill="#575757"/></svg>',
+  heart: '<svg viewBox="0 0 120 90" class="h-16 w-20"><path d="M60 78s-32-19-32-43a17 17 0 0 1 32-7 17 17 0 0 1 32 7c0 24-32 43-32 43Z" fill="none" stroke="#ff4100" stroke-width="5" stroke-linejoin="round"/><path d="M30 44h14l6-11 9 22 7-13 5 2h19" fill="none" stroke="#1a1a1a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  food:  '<svg viewBox="0 0 120 90" class="h-16 w-20"><circle cx="60" cy="46" r="26" fill="none" stroke="#ff4100" stroke-width="5"/><path d="M60 20v52M34 46h52" stroke="#dfdedd" stroke-width="3"/><path d="M26 16v22a7 7 0 0 0 14 0V16M33 16v22" stroke="#1a1a1a" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="M92 16c6 4 8 12 5 20l-5 36" stroke="#1a1a1a" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg>',
+  globe: '<svg viewBox="0 0 120 90" class="h-16 w-20"><circle cx="60" cy="45" r="30" fill="none" stroke="#ff4100" stroke-width="5"/><path d="M30 45h60M60 15c10 10 10 50 0 60M60 15c-10 10-10 50 0 60" fill="none" stroke="#1a1a1a" stroke-width="2.8"/></svg>',
+}
+
+const KIT_OPTIONS = [
+  { id:'kit-yes', art:'kit',  name:'Áno, chcem odberovú sadu',
+    desc:'Fyzická krabička so sterilnou tyčinkou a skúmavkou. Doručíme do 2 pracovných dní.',
+    price:199.95, note:'jednorazovo' },
+  { id:'kit-no',  art:'have', name:'Už DNA test GymBeam mám',
+    desc:'Vzorku odoberať znova netreba. Nové balíčky vyhodnotíme z vašej existujúcej vzorky.',
+    price:0, note:'bez príplatku' },
+]
+
+const SECTIONS = [
+  { id:'sport', title:'Šport a výkon', art:'sport',
+    desc:'Ako vaše telo reaguje na záťaž, akú stavbu má vaše svalstvo a koľko regenerácie naozaj potrebujete.',
+    items:[
+      { id:'s1', name:'Športový výkon', params:24, price:19.90,
+        desc:'Typ svalových vlákien, VO₂ max, ekonomika pohybu a predispozícia na výbušnosť.',
+        details:['Pomer rýchlych a pomalých svalových vlákien','Maximálna aeróbna kapacita (VO₂ max)','Predispozícia na výbušnú silu a šprint','Ekonomika behu a efektivita pohybu','Odpoveď na intervalový vs. objemový tréning','Riziko preťaženia pri vysokej záťaži'] },
+      { id:'s2', name:'Sila a svalová hmota', params:18, price:19.90,
+        desc:'Rýchlosť rastu svalov, odpoveď na kreatín a riziko preťaženia šliach.',
+        details:['Rýchlosť naberania svalovej hmoty','Citlivosť na kreatín a jeho dávkovanie','Potreba bielkovín na kilogram hmotnosti','Pevnosť šliach a väzív','Riziko zranenia pri silovom tréningu','Optimálna frekvencia tréningu svalovej partie'] },
+      { id:'s3', name:'Vytrvalosť a regenerácia', params:21, price:19.90,
+        desc:'Aeróbna kapacita, rýchlosť zotavenia a individuálna potreba spánku.',
+        details:['Rýchlosť zotavenia po tréningu','Individuálna potreba spánku','Tolerancia tréningového objemu','Zápalová odpoveď na záťaž','Riziko pretrénovania','Citlivosť na kofeín pred výkonom'] },
+    ]},
+  { id:'health', title:'Zdravie a dlhovekosť', art:'heart',
+    desc:'Predispozície, o ktorých sa oplatí vedieť skôr, než sa prejavia. Nejde o lekársku diagnostiku.',
+    items:[
+      { id:'h1', name:'Kardiovaskulárne zdravie', params:20, price:24.90,
+        desc:'Metabolizmus cholesterolu a tukov, sklon k vyššiemu krvnému tlaku.',
+        details:['Metabolizmus LDL a HDL cholesterolu','Hladina triglyceridov','Sklon k vyššiemu krvnému tlaku','Citlivosť na soľ v strave','Spracovanie omega-3 mastných kyselín','Predispozícia k zápalovým procesom ciev'] },
+      { id:'h2', name:'Metabolizmus a hmotnosť', params:17, price:24.90,
+        desc:'Inzulínová citlivosť, vnímanie sýtosti a sklon k ukladaniu tuku.',
+        details:['Inzulínová citlivosť a tolerancia sacharidov','Vnímanie sýtosti a hladu','Sklon k ukladaniu viscerálneho tuku','Bazálny metabolizmus','Odpoveď na nízkosacharidovú vs. nízkotučnú stravu','Efekt jo-jo pri redukcii'] },
+      { id:'h3', name:'Detoxikácia a oxidačný stres', params:14, price:24.90,
+        desc:'Aktivita pečeňových enzýmov a antioxidačná kapacita organizmu.',
+        details:['Aktivita pečeňových enzýmov fázy I a II','Antioxidačná kapacita organizmu','Spracovanie liečiv a doplnkov','Citlivosť na environmentálne toxíny','Potreba antioxidantov v strave','Rýchlosť odbúravania alkoholu'] },
+    ]},
+  { id:'nutrition', title:'Výživa a intolerancie', art:'food',
+    desc:'Čo vášmu telu sedí a čo mu robí problém — od vitamínov po kofeín.',
+    items:[
+      { id:'n1', name:'Vitamíny a minerály', params:15, price:21.90,
+        desc:'Vstrebávanie vitamínu D, B12, železa, horčíka a kyseliny listovej.',
+        details:['Vstrebávanie a potreba vitamínu D','Metabolizmus vitamínu B12 a kyseliny listovej','Hospodárenie so železom','Potreba horčíka a zinku','Spracovanie vitamínu A a E','Odporúčané dávkovanie doplnkov'] },
+      { id:'n2', name:'Intolerancie a citlivosti', params:12, price:21.90,
+        desc:'Laktóza, lepok, kofeín, histamín a alkohol.',
+        details:['Tolerancia laktózy','Citlivosť na lepok','Rýchlosť odbúravania kofeínu','Spracovanie histamínu','Tolerancia alkoholu','Citlivosť na umelé sladidlá'] },
+      { id:'n3', name:'Chuťové preferencie', params:9, price:21.90,
+        desc:'Vnímanie horkej a sladkej chuti, sklon k prejedaniu a nočnému maškrteniu.',
+        details:['Vnímanie horkej chuti','Preferencia sladkého','Sklon k prejedaniu','Nočné maškrtenie','Vnímanie slanej chuti','Chuťová únava a vyhľadávanie nových chutí'] },
+    ]},
+  { id:'origin', title:'Pôvod a národnosť', art:'globe',
+    desc:'Odkiaľ pochádzajú vaši predkovia a čo máte spoločné s dávnymi populáciami.',
+    items:[
+      { id:'o1', name:'Etnický pôvod', params:18, price:29.90,
+        desc:'Rozloženie vášho pôvodu naprieč 45 referenčnými populáciami sveta.',
+        details:['Percentuálne rozloženie pôvodu','45 referenčných populácií sveta','Mapa migrácie vašich predkov','Regionálne podskupiny v Európe','Porovnanie s priemerom populácie','Interaktívny výstup v zákazníckom účte'] },
+      { id:'o2', name:'Haploskupiny', params:9, price:29.90,
+        desc:'Materská a otcovská línia sledovaná tisíce rokov do minulosti.',
+        details:['Materská línia (mtDNA haploskupina)','Otcovská línia (Y-DNA, len pre mužov)','Vek a pôvod vašej haploskupiny','Mapa rozšírenia línie vo svete','Príbuzné haploskupiny','Známe historické osobnosti s rovnakou líniou'] },
+      { id:'o3', name:'Neandertálska DNA', params:6, price:14.90,
+        desc:'Podiel neandertálskych variantov vo vašom genóme a ich prejavy.',
+        details:['Percentuálny podiel neandertálskej DNA','Porovnanie s priemerom populácie','Varianty ovplyvňujúce metabolizmus','Varianty ovplyvňujúce spánok','Varianty ovplyvňujúce imunitu','Vplyv na typ vlasov a pokožky'] },
+    ]},
+]
+
+/* ===========================================================================
+   STATE
+   =========================================================================== */
+const state = { variant:'inline', step:1, kit:null, picked:new Set(), qty:1, cart:0, modalId:null }
+
+const ALL_ITEMS = new Map()
+SECTIONS.forEach(s => s.items.forEach(i => ALL_ITEMS.set(i.id, { ...i, section:s })))
+
+const eur = n => n.toFixed(2).replace('.', ',') + ' €'
+const kitOf = () => KIT_OPTIONS.find(k => k.id === state.kit) || null
+const plural = (n, one, few, many) => n === 1 ? one : n < 5 ? few : many
+// display:none beats any Tailwind display utility, unlike the [hidden] attribute
+const show = (el, on, mode = 'flex') => { el.style.display = on ? mode : 'none' }
+const $ = id => document.getElementById(id)
+
+function unitTotal(){
+  let t = kitOf() ? kitOf().price : 0
+  state.picked.forEach(id => { t += ALL_ITEMS.get(id).price })
+  return t
+}
+const grandTotal = () => unitTotal() * state.qty
+
+/* ===========================================================================
+   OVERLAYS — BottomModal under 1024px, classic Modal above.
+   Mirrors src/common/components/bottom-modal/* + modal.tsx's useMediaQuery split.
+   =========================================================================== */
+const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches
+let openCount = 0
+
+function openOverlay(el){
+  el.setAttribute('data-open', '')
+  requestAnimationFrame(() => el.setAttribute('data-shown', ''))
+  openCount++
+  document.body.style.overflow = 'hidden'
+  const focusable = el.querySelector('[data-close]')
+  if (focusable) focusable.focus({ preventScroll:true })
+}
+
+function closeOverlay(el){
+  if (!el.hasAttribute('data-open')) return
+  el.removeAttribute('data-shown')
+  setTimeout(() => el.removeAttribute('data-open'), 300)
+  openCount = Math.max(0, openCount - 1)
+  if (!openCount) document.body.style.overflow = ''
+}
+
+// close button + scrim
+document.addEventListener('click', e => {
+  const close = e.target.closest('[data-close]')
+  if (!close) return
+  const overlay = close.closest('.gb-overlay')
+  if (overlay) closeOverlay(overlay)
+})
+
+// Escape closes the topmost overlay
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return
+  const open = [...document.querySelectorAll('.gb-overlay[data-open]')]
+  if (open.length) closeOverlay(open[open.length - 1])
+})
+
+// swipe down to dismiss — useVerticalSwipe, threshold 50px, mobile only
+document.querySelectorAll('[data-swipe]').forEach(area => {
+  let y0 = null
+  area.addEventListener('touchstart', e => { y0 = e.touches[0].clientY }, { passive:true })
+  area.addEventListener('touchend', e => {
+    if (y0 === null || isDesktop()) return
+    const dy = e.changedTouches[0].clientY - y0
+    y0 = null
+    if (dy > 50) closeOverlay(area.closest('.gb-overlay'))
+  }, { passive:true })
+})
+
+/* ===========================================================================
+   VARIANT SWITCH — the same four nodes are re-parented, so state and
+   listeners survive the move.
+   =========================================================================== */
+const CFG = {
+  inline: {
+    head:  'px-5 pt-6 md:px-8 md:pt-8',
+    steps: 'border-grey-100 mt-5 flex w-full overflow-x-auto border-b px-5 md:px-8',
+    bar:   'border-grey-100 sticky bottom-0 z-30 flex flex-wrap items-center gap-4 border-t bg-white px-5 py-3.5 shadow-[0_-6px_18px_rgba(0,0,0,0.06)] md:px-8 md:py-4',
+    panel: 'cfg-panel px-5 py-7 md:px-8 md:py-8',
+    title: 'mt-1.5 text-xl font-black md:text-2xl',
+    lead:  'text-grey-500 mt-1 max-w-[70ch] text-sm leading-6',
+  },
+  modal: {
+    head:  'pb-1',
+    steps: 'border-grey-100 mt-3 flex w-full overflow-x-auto border-b px-4 md:px-6',
+    bar:   'flex flex-wrap items-center gap-4 bg-white px-4 py-3 md:px-6 md:py-4',
+    panel: 'cfg-panel px-4 py-5 md:px-6 md:py-6',
+    title: 'mt-1 text-lg font-black md:text-xl',
+    lead:  'text-grey-500 mt-1 hidden max-w-[70ch] text-sm leading-6 md:block',
+  },
+}
+
+function setVariant(v){
+  state.variant = v
+  const c = CFG[v]
+  const head = $('cfgHead'), steps = $('cfgSteps'), panels = $('cfgPanels'), bar = $('cfgBar')
+
+  if (v === 'modal') {
+    $('cfgHeadSlot').appendChild(head)
+    $('cfgStepsSlot').appendChild(steps)
+    $('cfgBodySlot').appendChild(panels)
+    $('cfgFooterSlot').appendChild(bar)
+    show($('cfgInline'), false)
+  } else {
+    const host = $('cfgInline')
+    host.append(head, steps, panels, bar)
+    show(host, true, 'block')
+    closeOverlay($('cfgModal'))
+  }
+
+  head.className = c.head
+  steps.className = c.steps
+  bar.className = c.bar
+  head.querySelector('h2').className = c.title
+  head.querySelector('p:last-of-type').className = c.lead
+  document.querySelectorAll('.cfg-panel').forEach(p => {
+    const active = p.hasAttribute('data-active')
+    p.className = c.panel
+    if (active) p.setAttribute('data-active', '')
+  })
+
+  document.querySelectorAll('.variant-btn').forEach(b => {
+    const on = b.dataset.variant === v
+    b.className = 'variant-btn cursor-pointer rounded px-3 py-1 text-xs font-bold whitespace-nowrap '
+      + (on ? 'bg-secondary text-white' : 'text-neutral-400 hover:text-white')
+  })
+
+  render()
+}
+
+document.querySelectorAll('.variant-btn').forEach(b => {
+  b.addEventListener('click', () => setVariant(b.dataset.variant))
+})
+
+$('openConfig').addEventListener('click', () => {
+  if (state.variant === 'modal') {
+    openOverlay($('cfgModal'))
+  } else {
+    $('cfgInline').scrollIntoView({ behavior:'smooth', block:'start' })
+  }
+})
+
+/* ===========================================================================
+   RENDER — the selected state is baked into the markup, never toggled
+   afterwards: two conflicting Tailwind utilities (bg-white vs bg-secondary)
+   resolve by stylesheet order, not by the order they were added.
+   =========================================================================== */
+function tick(on){
+  return `<span class="absolute top-3.5 right-3.5 z-10 flex h-6 w-6 items-center justify-center rounded-full border ${
+    on ? 'border-secondary bg-secondary' : 'border-grey-100 bg-white'}">
+    ${on ? '<svg class="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m4 12 6 6L20 6"/></svg>' : ''}
+  </span>`
+}
+const CARD_BASE = 'border-grey-100 hover:border-grey-200 relative w-full cursor-pointer rounded border bg-white text-left transition-colors'
+const CARD_ON   = 'border-secondary ring-secondary ring-1'
+
+function renderKits(){
+  $('kitGroup').innerHTML = KIT_OPTIONS.map(k => {
+    const on = state.kit === k.id
+    return `<button role="radio" aria-checked="${on}" data-kit="${k.id}" class="${CARD_BASE} ${on ? CARD_ON : ''} flex flex-col gap-3.5 p-5">
+      ${tick(on)}
+      <span class="bg-shadow flex h-[150px] items-center justify-center rounded">${ART[k.art]}</span>
+      <span class="block">
+        <span class="block text-base font-bold">${k.name}</span>
+        <span class="text-grey-500 mt-1 block text-sm leading-6">${k.desc}</span>
+      </span>
+      <span class="mt-auto block">
+        <span class="block text-lg font-black">${k.price ? eur(k.price) : 'Zadarmo'}</span>
+        <span class="text-grey-300 block text-xs font-semibold">${k.note}</span>
+      </span>
+    </button>`
+  }).join('')
+}
+
+function renderSections(){
+  $('pkgSections').innerHTML = SECTIONS.map(s => {
+    const n = s.items.filter(i => state.picked.has(i.id)).length
+    return `<div class="mb-9 last:mb-0">
+      <div class="mb-1 flex flex-wrap items-baseline gap-3">
+        <h4 class="text-xs font-bold tracking-widest uppercase">${s.title}</h4>
+        ${n ? `<span class="text-secondary text-xs font-semibold">${n} ${plural(n,'vybraný','vybrané','vybraných')}</span>` : ''}
+      </div>
+      <p class="text-grey-300 mb-4 text-sm">${s.desc}</p>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        ${s.items.map(i => {
+          const on = state.picked.has(i.id)
+          return `<div class="${CARD_BASE} ${on ? CARD_ON : ''} flex flex-col overflow-hidden">
+            ${tick(on)}
+            <button role="checkbox" aria-checked="${on}" data-pkg="${i.id}" class="flex flex-1 cursor-pointer flex-col text-left">
+              <span class="bg-shadow flex h-[132px] w-full items-center justify-center">${ART[s.art]}</span>
+              <span class="flex flex-1 flex-col gap-1.5 px-4 pt-4">
+                <span class="block text-[15px] leading-snug font-bold">${i.name}</span>
+                <span class="text-grey-500 block flex-1 text-sm leading-6">${i.desc}</span>
+                <span class="mt-2 flex items-center justify-between gap-3">
+                  <span class="text-grey-300 text-xs font-semibold tracking-wider uppercase">${i.params} parametrov</span>
+                  <span class="text-base font-black">${eur(i.price)}</span>
+                </span>
+              </span>
+            </button>
+            <button data-info="${i.id}" class="border-grey-100 text-grey-500 mx-4 mt-3 mb-4 flex cursor-pointer items-center justify-center gap-2 rounded border py-2 text-xs font-bold uppercase hover:border-black hover:text-black">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+              Čo balíček obsahuje
+            </button>
+          </div>`
+        }).join('')}
+      </div>
+    </div>`
+  }).join('')
+}
+
+function summaryRows(){
+  const rows = []
+  const k = kitOf()
+  if (k) rows.push({ art:k.art, name:k.name, cat:'Odberová sada', price:k.price, id:null, kit:true })
+  state.picked.forEach(id => {
+    const i = ALL_ITEMS.get(id)
+    rows.push({ art:i.section.art, name:i.name, cat:i.section.title, price:i.price, id, kit:false })
+  })
+  return rows
+}
+
+function renderSummary(){
+  const rows = summaryRows()
+
+  $('sumList').innerHTML = rows.length ? rows.map(r => `
+    <div class="border-grey-100 flex items-center gap-3.5 border-b p-4 last:border-b-0">
+      <span class="bg-shadow flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded [&_svg]:h-9 [&_svg]:w-11">${ART[r.art]}</span>
+      <span class="min-w-0 flex-1">
+        <span class="text-grey-300 block text-xs font-semibold tracking-wider uppercase">${r.cat}</span>
+        <span class="block text-sm font-semibold">${r.name}</span>
+      </span>
+      <span class="font-bold whitespace-nowrap">${r.price ? eur(r.price) : 'Zadarmo'}</span>
+      ${r.kit
+        ? `<button data-goto="1" class="text-grey-500 shrink-0 cursor-pointer rounded px-2 py-1 text-xs font-bold uppercase underline hover:text-black">Zmeniť</button>`
+        : `<button data-remove="${r.id}" aria-label="Odobrať ${r.name}" class="text-grey-300 hover:text-secondary shrink-0 cursor-pointer rounded p-1.5">
+             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+           </button>`}
+    </div>`).join('')
+    : '<p class="text-grey-300 px-5 py-10 text-center text-sm">Zatiaľ ste si nič nevybrali.<br>Vráťte sa na krok 1 alebo 2.</p>'
+
+  $('sumLines').innerHTML =
+    rows.map(r => `<div class="text-grey-500 flex justify-between gap-3 py-1 text-sm"><span>${r.name}</span><span>${r.price ? eur(r.price) : '0,00 €'}</span></div>`).join('')
+    + (state.qty > 1
+        ? `<div class="flex justify-between gap-3 py-1 text-sm font-semibold text-black"><span>× ${state.qty} konfigurácie</span><span>${eur(unitTotal())} / ks</span></div>`
+        : '')
+
+  $('sumTotal').textContent = eur(grandTotal())
+  $('addToCart').disabled = rows.length === 0
+
+  const n = state.picked.size * state.qty
+  show($('codeNotice'), n > 0)
+  if (n > 0) {
+    $('codeNoticeText').innerHTML =
+      `Po zaplatení dostanete <b class="font-semibold">${n} ${plural(n,'aktivačný kód','aktivačné kódy','aktivačných kódov')}</b> — jeden na každý balíček. ` +
+      `Nájdete ich v potvrdzovacom e-maile aj vo svojom účte v sekcii „Moje výsledky DNA testu“.`
+  }
+}
+
+function renderShell(){
+  document.querySelectorAll('.step-tab').forEach(t => {
+    const n = +t.dataset.step
+    const active = n === state.step
+    const done = n < state.step
+    t.setAttribute('aria-current', active ? 'step' : 'false')
+    t.classList.toggle('border-secondary', active)
+    t.classList.toggle('border-transparent', !active)
+    t.disabled = n > 1 && !state.kit
+    t.classList.toggle('opacity-50', t.disabled)
+    t.classList.toggle('cursor-not-allowed', t.disabled)
+    t.classList.toggle('cursor-pointer', !t.disabled)
+
+    t.querySelector('.step-num').className =
+      'step-num flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold '
+      + (active ? 'bg-secondary text-white' : done ? 'bg-black text-white' : 'bg-grey-100 text-grey-500')
+  })
+
+  document.querySelectorAll('[data-step-panel]').forEach(p => {
+    p.toggleAttribute('data-active', +p.dataset.stepPanel === state.step)
+  })
+
+  const k = kitOf()
+  $('hint-1').textContent = k ? k.name : 'Nevybrané'
+  $('hint-2').textContent = state.picked.size
+    ? `${state.picked.size} ${plural(state.picked.size,'vybraný','vybrané','vybraných')}`
+    : '0 vybraných'
+
+  show($('skipPackages'), state.step === 2 && state.kit === 'kit-yes', 'inline-flex')
+
+  $('barTotal').textContent = eur(grandTotal())
+  const bits = []
+  if (k) bits.push(k.price ? 'odberová sada' : 'bez sady')
+  if (state.picked.size) bits.push(`${state.picked.size} ${plural(state.picked.size,'balíček','balíčky','balíčkov')}`)
+  $('barPicked').textContent = bits.length ? bits.join(' · ') : 'Zatiaľ nič nevybrané'
+
+  // Step 3 carries its own add-to-cart in the summary box — one CTA, not two
+  show($('cfgBar'), state.step !== 3)
+  show($('btnBack'), state.step > 1)
+
+  const next = $('btnNext')
+  if (state.step === 1){
+    next.textContent = 'Ďalej'
+    next.disabled = !state.kit
+  } else {
+    const needsPackage = state.kit === 'kit-no' && state.picked.size === 0
+    next.textContent = needsPackage ? 'Vyberte aspoň jeden balíček' : 'Ďalej'
+    next.disabled = needsPackage
+  }
+
+  // running configuration on the PDP itself
+  const rows = summaryRows()
+  const hero = $('heroConfig')
+  show(hero, rows.length > 0, 'flex')
+  if (rows.length){
+    $('heroConfigText').textContent = bits.join(' · ')
+    $('heroConfigPrice').textContent = eur(grandTotal())
+  }
+}
+
+function render(){ renderKits(); renderSections(); renderSummary(); renderShell() }
+
+function goStep(n){
+  if (n > 1 && !state.kit) return
+  state.step = Math.min(3, Math.max(1, n))
+  render()
+  if (state.variant === 'modal' && $('cfgModal').hasAttribute('data-open')) {
+    $('cfgBodySlot').scrollTo({ top:0, behavior:'smooth' })
+  } else {
+    $('cfgInline').scrollIntoView({ behavior:'smooth', block:'start' })
+  }
+}
+
+/* ===========================================================================
+   PACKAGE DETAIL OVERLAY
+   =========================================================================== */
+function openPkg(id){
+  const i = ALL_ITEMS.get(id)
+  state.modalId = id
+  $('pkgModalCat').textContent = i.section.title
+  $('pkgModalTitle').textContent = i.name
+  $('pkgModalArt').innerHTML = ART[i.section.art]
+  $('pkgModalDesc').textContent = i.desc
+  $('pkgModalParams').textContent = `${i.params} parametrov`
+  $('pkgModalPrice').textContent = eur(i.price)
+  $('pkgModalList').innerHTML = i.details.map(d => `
+    <li class="flex items-start gap-2.5 text-sm leading-6">
+      <svg class="text-secondary mt-1.5 h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="m4 12 6 6L20 6"/></svg>
+      <span>${d}</span>
+    </li>`).join('')
+  syncPkgToggle()
+  openOverlay($('pkgModal'))
+}
+
+function syncPkgToggle(){
+  const on = state.picked.has(state.modalId)
+  const btn = $('pkgModalToggle')
+  btn.textContent = on ? 'Odobrať z výberu' : 'Pridať do výberu'
+  btn.className = 'flex h-12 cursor-pointer items-center justify-center rounded px-6 leading-normal font-bold whitespace-nowrap uppercase transition-colors duration-500 ease-in-out sm:px-8 '
+    + (on
+      ? 'border-2 border-black text-black hover:bg-black hover:text-white'
+      : 'bg-secondary hover:bg-secondary-strong text-white')
+}
+
+$('pkgModalToggle').addEventListener('click', () => {
+  const id = state.modalId
+  state.picked.has(id) ? state.picked.delete(id) : state.picked.add(id)
+  render()
+  syncPkgToggle()
+})
+
+/* ===========================================================================
+   EVENTS
+   =========================================================================== */
+document.addEventListener('click', e => {
+  const info = e.target.closest('[data-info]')
+  if (info){ openPkg(info.dataset.info); return }
+
+  const kit = e.target.closest('[data-kit]')
+  if (kit){ state.kit = kit.dataset.kit; render(); return }
+
+  const pkg = e.target.closest('[data-pkg]')
+  if (pkg){
+    const id = pkg.dataset.pkg
+    state.picked.has(id) ? state.picked.delete(id) : state.picked.add(id)
+    render(); return
+  }
+
+  const rm = e.target.closest('[data-remove]')
+  if (rm){ state.picked.delete(rm.dataset.remove); render(); return }
+
+  const goto = e.target.closest('[data-goto]')
+  if (goto){ goStep(+goto.dataset.goto); return }
+
+  const tab = e.target.closest('.step-tab')
+  if (tab && !tab.disabled){ goStep(+tab.dataset.step) }
+})
+
+$('skipPackages').addEventListener('click', () => goStep(3))
+$('btnBack').addEventListener('click', () => goStep(state.step - 1))
+$('btnNext').addEventListener('click', () => goStep(state.step + 1))
+$('addToCart').addEventListener('click', addToCart)
+
+const qtyInput = $('qtyInput')
+function setQty(n){
+  state.qty = Math.min(20, Math.max(1, n || 1))
+  qtyInput.value = state.qty
+  $('qtyMinus').disabled = state.qty <= 1
+  $('qtyPlus').disabled = state.qty >= 20
+  renderSummary(); renderShell()
+}
+$('qtyMinus').addEventListener('click', () => setQty(state.qty - 1))
+$('qtyPlus').addEventListener('click', () => setQty(state.qty + 1))
+qtyInput.addEventListener('change', () => setQty(parseInt(qtyInput.value, 10)))
+
+function addToCart(){
+  const rows = summaryRows()
+  if (!rows.length) return
+  state.cart += rows.length * state.qty
+  $('cartCount').textContent = state.cart
+  show($('cartBadge'), true)
+  const sum = $('cartSum')
+  sum.textContent = eur(grandTotal())
+  show(sum, true, 'block')
+  toast(`Pridané do košíka — ${rows.length} ${plural(rows.length,'položka','položky','položiek')} × ${state.qty} · ${eur(grandTotal())}`)
+  if (state.variant === 'modal') closeOverlay($('cfgModal'))
+}
+
+let toastTimer
+function toast(msg){
+  $('toastText').textContent = msg
+  const t = $('toast')
+  t.classList.remove('translate-y-[150%]')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => t.classList.add('translate-y-[150%]'), 3800)
+}
+
+const heroDesc = $('heroDesc')
+$('heroMore').addEventListener('click', e => {
+  const open = heroDesc.toggleAttribute('data-expanded')
+  e.target.textContent = open ? 'Zobraziť menej' : 'Zobraziť viac'
+})
+
+$('priceFrom').textContent = eur(KIT_OPTIONS[0].price)
+setQty(1)
+setVariant('inline')
+</script>
+</body>
+</html>
